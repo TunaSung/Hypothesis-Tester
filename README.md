@@ -8,7 +8,6 @@
 2. **執行統計計算**（p-value、95% CI、效果量、前提檢查）
 3. **AI 白話解釋**（中/英文、商務/論文語氣切換）
 4. **即時回饋**：Socket.IO 推送進度條、AI 串流文字、多用戶留言協作
-5. **匯出報告**：一鍵生成 Markdown / PNG 圖表，直接放進論文或簡報
 
 ---
   
@@ -18,6 +17,7 @@
 - **Statistics**：simple-statistics + jstat
 - **AI**：OpenAI Responses API (解釋/方法建議)
   
+
 
 
 
