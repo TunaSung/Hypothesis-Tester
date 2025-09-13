@@ -1,0 +1,5 @@
+### 1. 上傳 CSV
+POST http://localhost:3000/api/dataset/upload
+Content-Type: multipart/form-data
+
+file=@./sample.csv

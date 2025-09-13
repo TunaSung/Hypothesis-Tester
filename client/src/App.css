@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@import "aos/dist/aos.css";
+
+/* ------------------- *\
+Globel;
+\* ------------------- */
+@layer base{
+    *{
+        @apply relative box-border scroll-smooth
+    }
+    h1,h2,h3,h4,h5,h6,p,ul {
+      @apply m-0
+    }
+    ul {
+      @apply p-0
+    }
+    button{
+        @apply cursor-pointer
+    }
+    body{
+        @apply font-['Arial']
+    }
+}
+
+/* ------------------- *\
+Layout
+\* ------------------- */
+
+.container-mid {
+    @apply w-[98%] md:w-[90%] lg:w-[80%] xl:w-[75%] 2xl:w-[65%] mx-auto px-4 sm:px-6 lg:px-8
+}
+
+.cart-container {
+    @apply px-8 flex items-center justify-center
+}
+
+.row {
+    @apply mx-[-16px]
+}
+
+@layer utilities {
+    .gap-rwd {
+        gap: clamp(24px, 3vw, 32px);
+    }
+}
+
+/* ------------------- *\
+Conponent
+\* ------------------- */
+
+/* background */
+@layer components {
+    .bg-cover-set {
+        @apply bg-cover bg-no-repeat bg-center
+    }
+    .bg-contain-set {
+        @apply bg-contain bg-no-repeat bg-center
+    }
+}
+
+/* position */
+@layer components {
+    /* navbar label position */
+    .navbar-menu-mid {
+        @apply m-0 absolute left-1/2 top-[70%] -translate-x-1/2
+    }
+    /* navbar label's items position */
+    .navbar-items-mid {
+        @apply m-0 absolute left-1/2 top-[100%] -translate-x-1/2
+    }
+    .absolute-mid {
+        @apply m-0 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+    }
+    .fixed-mid {
+        @apply fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+    }
+}
