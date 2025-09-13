@@ -17,10 +17,7 @@
 - **Backend**：Node.js (Express + Socket.IO)
 - **Statistics**：simple-statistics + jstat
 - **AI**：OpenAI Responses API (解釋/方法建議)
-
----
   
-## 進度
-前端刻板
+
 
 
