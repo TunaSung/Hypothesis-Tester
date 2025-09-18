@@ -13,10 +13,11 @@
   
 ##  技術棧
 - **Frontend**：React (Vite + TS) + Tailwind
-- **Backend**：Node.js (Express + Socket.IO)
+- **Backend**：Node.js (Express)
 - **Statistics**：simple-statistics + jstat
 - **AI**：OpenAI Responses API (解釋/方法建議)
   
+
 
 
 
