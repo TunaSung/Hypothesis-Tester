@@ -1,5 +1,76 @@
-### 1. 上傳 CSV
-POST http://localhost:3000/api/dataset/upload
-Content-Type: multipart/form-data
+POST http://localhost:8080/api/dataset/upload
+Content-Type: multipart/form-data; boundary=MyBoundary
 
-file=@./sample.csv
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="sample.csv"
+Content-Type: text/csv
+
+< ./sample.csv
+--MyBoundary--
+
+###
+GET http://localhost:8080/api/dataset/meta?id=2
+
+
+### 3. AI 建議方法
+POST http://localhost:8080/api/analysis/suggest
+Content-Type: application/json
+
+{
+  "datasetId": 1,
+  "question": "A 與 B 的平均數是否有差異？"
+}
+
+### 4. 獨立樣本 t 檢定 (含 Levene, Cohen's d, CI)
+POST http://localhost:8080/api/analysis/run
+Content-Type: application/json
+
+{
+  "datasetId": 3,
+  "method": "independent_t",
+  "args": {
+    "groupKey": "group",
+    "valueKey": "score",
+    "ciLevel": 0.95
+  }
+}
+
+### 5. 配對樣本 t 檢定 (含 Cohen's dz, CI)
+POST http://localhost:8080/api/analysis/run
+Content-Type: application/json
+
+{
+  "datasetId": 3,
+  "method": "paired_t",
+  "args": {
+    "preKey": "pre",
+    "postKey": "post",
+    "ciLevel": 0.9
+  }
+}
+
+### 6. ANOVA (含 η² + CI)
+POST http://localhost:8080/api/analysis/run
+Content-Type: application/json
+
+{
+  "datasetId": 3,
+  "method": "anova",
+  "args": {
+    "groupKey": "grp",
+    "valueKey": "y"
+  }
+}
+
+### 7. 相關分析 (含 Fisher z CI)
+POST http://localhost:8080/api/analysis/run
+Content-Type: application/json
+
+{
+  "datasetId": 3,
+  "method": "correlation",
+  "args": {
+    "xKey": "height",
+    "yKey": "weight"
+  }
+}
