@@ -1,6 +1,5 @@
 import { DataTypes, Model, type InferAttributes, type InferCreationAttributes } from "sequelize";
 import { sqlize } from "../config/db.js";
-import { Dataset } from "./Dataset.js";
 
 export class Analysis extends Model<InferAttributes<Analysis>, InferCreationAttributes<Analysis>> {
   declare id?: number;

@@ -1,8 +1,15 @@
 import * as ss from "simple-statistics";
-import * as jStat from "jstat"; // jStat: studentt / centralF / normal 分布工具
+import * as jstatNs from "jstat"; // jStat: studentt / centralF / normal 分布工具
 
 type Rows = Record<string, string | number>[];
 type CI = { level: number; lower: number; upper: number };
+const jStat: any =
+  // ESM 命名匯出
+  (jstatNs as any).jStat ??
+  // default 上再掛 jStat（一些打包器會長這樣）
+  (jstatNs as any).default?.jStat ??
+  // 直接用 namespace（最後手段）
+  (jstatNs as any);
 
 /** ---------- Utilities ---------- **/
 

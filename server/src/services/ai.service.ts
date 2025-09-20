@@ -33,24 +33,17 @@ export async function suggestMethod(params: { columns: string[]; question: strin
   ].join(" ");
 
   try {
-    const resp = await client.responses.create({
-      model: "gpt-4o-mini",
-      // 建議：用多訊息而非把所有東西塞成單一文字
-      input: [
-        { role: "system", content: prompt },
-        {
-          role: "user",
-          content: [
-            `columns: ${JSON.stringify(columns)}`,
-            `question: ${question}`
-          ].join("\n")
-        }
+    const resp = await client.chat.completions.create({
+      model: "gpt-4o-mini",            // 若 404，可先試 "gpt-4o-mini-2024-07-18" 或 "gpt-4o-mini-latest"
+      messages: [
+        { role: "system", content: "You are a statistician. Return ONLY JSON: {\"method\":\"...\",\"why\":\"...\"}" },
+        { role: "user", content: `columns: ${JSON.stringify(columns)}\nquestion: ${question}` }
       ],
-      // ✅ 強制回傳 JSON 物件（Responses API 支援）
-      temperature: 0.2
+      temperature: 0.2,
+      response_format: { type: "json_object" } // ✅ 強制 JSON
     });
+    const text = resp.choices[0]?.message?.content ?? "{}";
 
-    const text = resp.output_text ?? "{}";
 
     // 解析 + 驗證
     const parsed = SuggestionSchema.safeParse(JSON.parse(text));
@@ -106,8 +99,8 @@ export async function explainResult(input: any, result: any): Promise<string> {
 function ruleBasedSuggest(columns: string[], question: string, reason: string = "no_api_key"): Suggestion {
   const q = question.toLowerCase();
   // 極簡關鍵字判斷（可再擴充）
-  if (q.includes("相關") || q.includes("correlat")) return { method: "correlation",  why: "題意詢問關聯性" };
-  if (q.includes("前後") || q.includes("paired") || q.includes("同一受試者")) return { method: "paired_t",   why: "配對/重複測量設計" };
-  if (q.includes("三組") || q.includes("多組") || q.includes("anova")) return { method: "anova",        why: "三組以上群組比較" };
+  if (q.includes("相關") || q.includes("correlat")) return { method: "correlation", why: "題意詢問關聯性" };
+  if (q.includes("前後") || q.includes("paired") || q.includes("同一受試者")) return { method: "paired_t", why: "配對/重複測量設計" };
+  if (q.includes("三組") || q.includes("多組") || q.includes("anova")) return { method: "anova", why: "三組以上群組比較" };
   return { method: "independent_t", why: `預設二組比較（${reason}）` };
 }

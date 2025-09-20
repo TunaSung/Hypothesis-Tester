@@ -7,7 +7,6 @@ export const suggestSchema = z.object({
     // datasetId 必須是正整數
     datasetId: z.number().int().positive(),
 
-    // question 必須是長度 >= 5 的字串
     question: z.string().min(5)
   }),
 
@@ -16,7 +15,6 @@ export const suggestSchema = z.object({
   query: z.object({}).passthrough(),
 
   // 驗證 req.params
-  // 同樣允許任何路由參數，不限制
   params: z.object({}).passthrough()
 });
 
@@ -27,7 +25,6 @@ export const runAnalysisSchema = z.object({
     // datasetId 必須是正整數
     datasetId: z.number().int().positive(),
 
-    // method 限定只能是這四種統計方法
     method: z.enum(["independent_t","paired_t","anova","correlation"]),
 
     // args: 額外參數
