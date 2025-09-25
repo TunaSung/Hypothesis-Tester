@@ -1,6 +1,7 @@
 import StepCard from "./components/StepCard";
 import FeatureCard from "./components/FeatureCard";
 import { FEATURES, STEPS } from "./datas/Landing.data";
+import { Link } from "react-router-dom";
 
 function Landing() {
   return (
@@ -8,7 +9,7 @@ function Landing() {
       aria-labelledby="landing-hero-title"
       className="container-mid py-16"
     >
-      {/* Hero Section */}
+      {/* Start Hero Section */}
       <header className="text-center mb-20 flex flex-col items-center gap-8">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-800 mb-6">
           Statistical Testing
@@ -21,19 +22,21 @@ function Landing() {
           professional statistical analysis with clear explanations and
           beautiful visualizations.
         </p>
-        <button
+        <Link
+          to={'/analyze'}
           aria-label="Get started with statistical testing"
-          className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold cursor-pointer hover:from-blue-700 hover:to-teal-700 transition-all duration-250 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+          className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold cursor-pointer hover:from-blue-700 hover:to-teal-700 transition-all duration-250 shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transform"
         >
           Get Started
-        </button>
+        </Link>
       </header>
+      {/* End Hero Section */}
 
-      {/* Features Grid */}
+      {/* Start Features */}
       <section
         aria-labelledby="features-title"
         className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
-      >
+        >
         {FEATURES.map((feature) => (
           <FeatureCard
             key={feature.key}
@@ -43,8 +46,9 @@ function Landing() {
           />
         ))}
       </section>
+      {/* End Features */}
 
-      {/* How It Works */}
+      {/* Start Step */}
       <section
         aria-labelledby="how-it-works-title"
         className="bg-white rounded-3xl p-12 shadow-sm border border-slate-100"
@@ -68,6 +72,8 @@ function Landing() {
           ))}
         </ul>
       </section>
+      {/* End Step */}
+
     </section>
   );
 }
