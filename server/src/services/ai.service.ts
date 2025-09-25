@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import "dotenv/config";
 import { z } from "zod";
 
-/** 回傳 JSON 結構的驗證：只允許四種方法，why 為非空字串 */
+/** 回傳 JSON 結構的驗證：先只允許四種方法，why 為非空字串 */
 const SuggestionSchema = z.object({
   method: z.enum(["independent_t", "paired_t", "anova", "correlation"]),
   why: z.string().min(1)
@@ -10,9 +10,8 @@ const SuggestionSchema = z.object({
 type Suggestion = z.infer<typeof SuggestionSchema>;
 
 const client = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
-
+? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+: null;
 /** ----------------------------- Public APIs ----------------------------- **/
 
 /**
@@ -25,22 +24,22 @@ export async function suggestMethod(params: { columns: string[]; question: strin
 
   if (!client) return ruleBasedSuggest(columns, question);
 
-  // 👉 system 指令縮短、明確，並用 response_format 強制 JSON
+  // system 指令
   const prompt = [
     `You are a statistician.`,
-    `Choose exactly ONE method from: independent_t, paired_t, anova, correlation.`,
-    `Return ONLY a JSON object like: {"method":"...", "why":"..."} (no extra text).`
+    `Choose exactly one method from: independent_t, paired_t, anova, correlation.`,
+    `Return only a JSON object like: {"method":"...", "why":"..."} (no extra text).`
   ].join(" ");
 
   try {
     const resp = await client.chat.completions.create({
-      model: "gpt-4o-mini",            // 若 404，可先試 "gpt-4o-mini-2024-07-18" 或 "gpt-4o-mini-latest"
+      model: "gpt-4.1-mini",
       messages: [
-        { role: "system", content: "You are a statistician. Return ONLY JSON: {\"method\":\"...\",\"why\":\"...\"}" },
+        { role: "system", content: prompt },
         { role: "user", content: `columns: ${JSON.stringify(columns)}\nquestion: ${question}` }
       ],
       temperature: 0.2,
-      response_format: { type: "json_object" } // ✅ 強制 JSON
+      response_format: { type: "json_object" }  // 強制 JSON
     });
     const text = resp.choices[0]?.message?.content ?? "{}";
 
@@ -49,26 +48,24 @@ export async function suggestMethod(params: { columns: string[]; question: strin
     const parsed = SuggestionSchema.safeParse(JSON.parse(text));
     if (parsed.success) return parsed.data;
 
-    // 若模型 JSON 結構怪怪的，退回規則式
+    // 輸出不合格則走 fallback
     return ruleBasedSuggest(columns, question, "malformed_model_output");
   } catch (err) {
-    // 網路/限流/服務端錯誤 → 回到規則式
     return ruleBasedSuggest(columns, question, "api_error");
   }
 }
 
 /**
- * 將統計輸入 & 結果，生成「中文白話解釋」。
- * - 有 key → 模型產出；沒 key → 極簡 fallback。
+ * 將統計輸入 & 結果，生成解釋。
  */
 export async function explainResult(input: any, result: any): Promise<string> {
   if (!client) {
     const pStr = result?.p?.toFixed?.(4) ?? "?";
-    return `結果摘要：p = ${pStr}。若 p < 0.05，則差異具有統計顯著性；若 p ≥ 0.05，則目前證據不足以拒絕虛無假設。`;
+    return `Summary: p = ${pStr}. If p < 0.05, the difference is statistically significant; if p ≥ 0.05, the evidence is insufficient to reject the null hypothesis.`;
   }
 
   const userContent = [
-    `Explain this statistical result in plain Chinese, concise but accurate.`,
+    `Explain this statistical result in plain English, concise but accurate.`,
     `Include: which test was used, what the p-value implies, and a short practical implication.`,
     `Input: ${JSON.stringify(input)}`,
     `Result: ${JSON.stringify(result)}`
@@ -76,7 +73,7 @@ export async function explainResult(input: any, result: any): Promise<string> {
 
   try {
     const resp = await client.responses.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
       input: [
         { role: "system", content: "You are a careful statistician and clear technical writer." },
         { role: "user", content: userContent }
@@ -86,19 +83,18 @@ export async function explainResult(input: any, result: any): Promise<string> {
     return (resp.output_text ?? "").trim();
   } catch {
     const pStr = result?.p?.toFixed?.(4) ?? "?";
-    return `結果摘要：p = ${pStr}。若 p < 0.05，則差異具有統計顯著性；若 p ≥ 0.05，則目前證據不足以拒絕虛無假設。`;
+    return `Summary: p = ${pStr}. If p < 0.05, the difference is statistically significant; if p ≥ 0.05, the evidence is insufficient to reject the null hypothesis.`
   }
 }
 
 /** ----------------------------- Fallbacks ----------------------------- **/
 
 /**
- * 規則式建議（無金鑰或 API 失敗時使用）
- * - 可加入欄位線索（有沒有兩個群組欄位、是否有連續數值欄位…）做更精細路由。
+ * 無金鑰、API 失敗或額度用完時使用
  */
 function ruleBasedSuggest(columns: string[], question: string, reason: string = "no_api_key"): Suggestion {
   const q = question.toLowerCase();
-  // 極簡關鍵字判斷（可再擴充）
+  // 極簡關鍵字判斷
   if (q.includes("相關") || q.includes("correlat")) return { method: "correlation", why: "題意詢問關聯性" };
   if (q.includes("前後") || q.includes("paired") || q.includes("同一受試者")) return { method: "paired_t", why: "配對/重複測量設計" };
   if (q.includes("三組") || q.includes("多組") || q.includes("anova")) return { method: "anova", why: "三組以上群組比較" };

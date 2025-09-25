@@ -4,19 +4,20 @@ import { createReadStream } from "fs";
 /**
  * 非同步讀取 CSV 檔案
  * @param path - 檔案路徑
- * @returns Promise，解析後的資料列陣列，每列是 { 欄位名: 值 } 的物件
+ * @returns 陣列，每列是 {欄位名str: 字串str} 的物件
  */
 
 export async function readCSV(path: string): Promise<Record<string, string>[]> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {  // 供後續 await
     const rows: Record<string, string>[] = [];
 
     // 建立檔案讀取串流，傳給 csv-parse 解析器
     createReadStream(path)
-      .pipe(
+      .pipe(  // 把檔案串流導到 csv-parse 解析器裡
         parse({
-          columns: true, // 解析時自動用第一列當欄位名稱
-          trim: true     // 去掉欄位值的前後空白
+          columns: true,  // 解析時自動用第一列當欄位名稱
+          trim: true,  // 去掉欄位值的前後空白
+          skip_empty_lines: true
         })
       )
       // 每讀到一列資料，就 push 到 rows 陣列

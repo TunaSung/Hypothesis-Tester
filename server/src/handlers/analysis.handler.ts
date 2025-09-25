@@ -4,8 +4,7 @@ import { readCSV } from "../services/csv.service.js";
 import { suggestMethod, explainResult } from "../services/ai.service.js";
 import { independentT, pairedT, anovaOneWay, correlation } from "../services/stat.service.js";
 
-export const suggest: RequestHandler =
-  async (req: Request, res: Response, next: NextFunction) => {
+export const suggest: RequestHandler = async (req, res, next) => {
     try {
       const { datasetId, question } = req.body;
       const ds = await Dataset.findByPk(datasetId);
@@ -18,8 +17,7 @@ export const suggest: RequestHandler =
     }
   };
 
-export const runAnalysis: RequestHandler =
-  async (req: Request, res: Response, next: NextFunction) => {
+export const runAnalysis: RequestHandler = async (req, res, next) => {
     try {
       const { datasetId, method, args } = req.body as {
         datasetId: number;
