@@ -5,6 +5,8 @@ import { FAQS, TEST_TYPES, DISCLAIMERS } from "./datas/Docs.data";
 function Docs() {
   return (
     <div className="container-mid py-8">
+
+      {/* Start Header */}
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-slate-800 mb-2">
           Documentation
@@ -13,8 +15,9 @@ function Docs() {
           Learn how to use the AI Hypothesis Tester effectively
         </p>
       </header>
+      {/* End Header */}
 
-      {/* Getting Started */}
+      {/* Start Getting Started */}
       <section className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8">
         <h2 className="text-2xl font-bold text-slate-800 mb-6">
           Getting Started
@@ -59,8 +62,9 @@ function Docs() {
           </div>
         </div>
       </section>
+      {/*　End Getting Started */}
 
-      {/* Supported Tests */}
+      {/* Start Supported Tests */}
       <section className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8">
         <h2 className="text-2xl font-bold text-slate-800 mb-6">
           Supported Statistical Tests
@@ -71,32 +75,36 @@ function Docs() {
           ))}
         </ul>
       </section>
+      {/* End Supported Tests */}
 
-      {/* FAQ */}
+      {/* Start FAQ */}
       <section className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8">
         <h2 className="text-2xl font-bold text-slate-800 mb-6">
           Frequently Asked Questions
         </h2>
         <div className="space-y-4">
-          {FAQS.map((faq) => (
-            <FAQItem key={faq.question} faq={faq} />
+          {FAQS.map((f) => (
+            <FAQItem key={f.question} faq={f} />
           ))}
         </div>
       </section>
+      {/* End FAQ */}
 
-      {/* Disclaimers */}
+      {/* Start Disclaimers */}
       <section className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-100">
         <h2 className="text-2xl font-bold text-amber-800 mb-4">
           ⚠️ Important Disclaimers
         </h2>
         <ul className="space-y-3 text-amber-700 list-disc list-inside">
-          {DISCLAIMERS.map((disclaimer) => (
-            <li>
-                {disclaimer}
+          {DISCLAIMERS.map((d, i) => (
+            <li key={`disclaimer-${i}`}>
+                {d}
             </li>
           ))}
         </ul>
       </section>
+      {/* End Disclaimers */}
+    
     </div>
   );
 }

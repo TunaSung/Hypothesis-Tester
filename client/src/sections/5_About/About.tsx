@@ -5,7 +5,9 @@ import { FEATURES, STATS } from "./data/About.data";
 function About() {
   return (
     <div className="container-mid py-8">
-      <div className="mb-12">
+
+      {/* Start Header */}
+      <header className="mb-12">
         <h1 className="text-3xl font-bold text-slate-800 mb-2">
           About AI Hypothesis Tester
         </h1>
@@ -13,10 +15,11 @@ function About() {
           Making statistical analysis accessible to researchers, students, and
           professionals
         </p>
-      </div>
+      </header>
+      {/* End Header */}
 
-      {/* Mission */}
-      <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-3xl p-12 mb-12 border border-blue-100">
+      {/* Start Mission */}
+      <section className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-3xl p-12 mb-12 border border-blue-100">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-slate-800 mb-6">
             Our Mission
@@ -28,10 +31,11 @@ function About() {
             undergraduate students to seasoned researchers.
           </p>
         </div>
-      </div>
+      </section>
+      {/* End Mission */}
 
-      {/* Features */}
-      <div className="mb-12">
+      {/* Start Features */}
+      <section className="mb-12">
         <h2 className="text-2xl font-bold text-slate-800 mb-8 text-center">
           What Makes Us Different
         </h2>
@@ -40,22 +44,24 @@ function About() {
             <FeatureItem key={feature.title} feature={feature}/>
           ))}
         </div>
-      </div>
+      </section>
+      {/* End Features */}
 
-      {/* Stats */}
-      <div className="bg-white rounded-3xl p-12 shadow-sm border border-slate-100 mb-12">
+      {/* Start Stats */}
+      <section className="bg-white rounded-3xl p-12 shadow-sm border border-slate-100 mb-12">
         <h2 className="text-2xl font-bold text-slate-800 mb-8 text-center">
           By the Numbers
         </h2>
-        <div className="grid md:grid-cols-4 gap-8 text-center">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {STATS.map((stat) => (
             <StatItem key={stat.title} stat={stat} />
           ))}
         </div>
-      </div>
+      </section>
+      {/* End Stats */}
 
-      {/* Contact */}
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl p-12 text-center">
+      {/* Start Contact */}
+      <section className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl p-12 text-center">
         <h2 className="text-2xl font-bold text-slate-800 mb-4">Get in Touch</h2>
         <p className="text-slate-600 mb-6">
           Have questions, feedback, or need help with your analysis? We'd love
@@ -69,7 +75,9 @@ function About() {
             Request Feature
           </button>
         </div>
-      </div>
+      </section>
+      {/* End Contact */}
+
     </div>
   );
 }

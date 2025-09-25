@@ -11,21 +11,21 @@ import { uploadCSV, aiSuggest, runTest } from "./services/Analyze.service";
 import type { Method, RunResp, SuggestResp } from "../../types/Analyze";
 
 function Analyze() {
-  // ===== Refs =====
+  // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ===== Dataset / Columns =====
+  // Dataset / Columns
   const [datasetId, setDatasetId] = useState<number | null>(null);
   const [datasetName, setDatasetName] = useState<string>("");
   const [columns, setColumns] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // ===== Question / Suggest =====
+  // Question / Suggest
   const [question, setQuestion] = useState("");
   const [suggestedTest, setSuggestedTest] = useState<SuggestResp | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<Method | "">("");
 
-  // ===== Per-method keys =====
+  // Per-method keys
   const [groupKey, setGroupKey] = useState("");
   const [valueKey, setValueKey] = useState("");
   const [preKey, setPreKey] = useState("");
@@ -33,19 +33,21 @@ function Analyze() {
   const [xKey, setXKey] = useState("");
   const [yKey, setYKey] = useState("");
 
-  // ===== Settings =====
+  // Settings
   const [significanceLevel, setSignificanceLevel] = useState(0.05);
-  const [testDirection, setTestDirection] = useState<"two-tail" | "left-tail" | "right-tail">(
-    "two-tail"
-  ); // 後端暫不使用，UI預留
+  const [testDirection, setTestDirection] = useState<
+    "two-tail" | "left-tail" | "right-tail"
+  >("two-tail");
 
-  // ===== Run / Result / Error =====
+  // Run / Result / Error
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<RunResp | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // ===== Handlers =====
-  const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
+  // Handlers
+  const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
+    e
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploading(true);
@@ -59,7 +61,12 @@ function Analyze() {
       setDatasetId(data.id);
       setDatasetName(data.filename);
       setColumns(data.columns ?? []);
-      setGroupKey(""); setValueKey(""); setPreKey(""); setPostKey(""); setXKey(""); setYKey("");
+      setGroupKey("");
+      setValueKey("");
+      setPreKey("");
+      setPostKey("");
+      setXKey("");
+      setYKey("");
       setSuggestedTest(null);
       setSelectedMethod("");
     } catch (err: any) {
@@ -90,7 +97,16 @@ function Analyze() {
     if (selectedMethod === "anova") return !!groupKey && !!valueKey;
     if (selectedMethod === "correlation") return !!xKey && !!yKey;
     return false;
-  }, [datasetId, selectedMethod, groupKey, valueKey, preKey, postKey, xKey, yKey]);
+  }, [
+    datasetId,
+    selectedMethod,
+    groupKey,
+    valueKey,
+    preKey,
+    postKey,
+    xKey,
+    yKey,
+  ]);
 
   const handleRunAnalysis = async () => {
     if (!readyToRun || !selectedMethod || !datasetId) return;
@@ -101,13 +117,21 @@ function Analyze() {
       const args: Record<string, any> = { ciLevel: 1 - significanceLevel };
       switch (selectedMethod) {
         case "independent_t":
-          args.groupKey = groupKey; args.valueKey = valueKey; break;
+          args.groupKey = groupKey;
+          args.valueKey = valueKey;
+          break;
         case "paired_t":
-          args.preKey = preKey; args.postKey = postKey; break;
+          args.preKey = preKey;
+          args.postKey = postKey;
+          break;
         case "anova":
-          args.groupKey = groupKey; args.valueKey = valueKey; break;
+          args.groupKey = groupKey;
+          args.valueKey = valueKey;
+          break;
         case "correlation":
-          args.xKey = xKey; args.yKey = yKey; break;
+          args.xKey = xKey;
+          args.yKey = yKey;
+          break;
       }
       const data = await runTest(datasetId, selectedMethod, args);
       setResult(data);
@@ -118,17 +142,23 @@ function Analyze() {
     }
   };
 
-  // ===== UI =====
   return (
     <div className="container-mid py-8">
+
+      {/* Start Header */}
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">Analysis Workspace</h1>
-        <p className="text-slate-600">Upload your data and describe your research question to get started</p>
+        <h1 className="text-3xl font-bold text-slate-800 mb-2">
+          Analysis Workspace
+        </h1>
+        <p className="text-slate-600">
+          Upload your data and describe your research question to get started
+        </p>
       </header>
+      {/* End Header */}
 
       <main className="grid lg:grid-cols-3 gap-8">
-        {/* Left */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Start Left */}
+        <section className="lg:col-span-2 space-y-6">
           <UploadCard
             isUploading={isUploading}
             onPick={() => fileInputRef.current?.click()}
@@ -147,7 +177,9 @@ function Analyze() {
           />
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <h2 className="text-xl font-semibold text-slate-800 mb-4">Variable Selection</h2>
+            <h2 className="text-xl font-semibold text-slate-800 mb-4">
+              Variable Selection
+            </h2>
             <MethodChooser
               selectedMethod={selectedMethod}
               setSelectedMethod={setSelectedMethod}
@@ -170,10 +202,11 @@ function Analyze() {
               setYKey={setYKey}
             />
           </div>
-        </div>
+        </section>
+        {/* End Left */}
 
-        {/* Right */}
-        <div className="space-y-6">
+        {/* Start Right */}
+        <section className="space-y-6">
           <ErrorAlert message={errorMsg} />
 
           <AnalysisSettings
@@ -202,19 +235,27 @@ function Analyze() {
             <div className="space-y-4">
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                 <div className="text-sm text-slate-700 space-y-2">
-                  <div><span className="font-medium">Method:</span> {result.method}</div>
+                  <div>
+                    <span className="font-medium">Method:</span> {result.method}
+                  </div>
                   {result.aiSummary && (
                     <div className="mt-3 p-3 rounded-lg bg-slate-50 text-slate-700">
                       <div className="font-semibold mb-1">AI Summary</div>
-                      <div className="whitespace-pre-wrap">{result.aiSummary}</div>
+                      <div className="whitespace-pre-wrap">
+                        {result.aiSummary}
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
-              <ResultCard result={result.result} confidence={1 - significanceLevel} />
+              <ResultCard
+                result={result.result}
+                confidence={1 - significanceLevel}
+              />
             </div>
           )}
-        </div>
+        </section>
+        {/* End Right */}
       </main>
     </div>
   );

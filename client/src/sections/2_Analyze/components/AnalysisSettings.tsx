@@ -38,7 +38,8 @@ export function AnalysisSettings({
           <select
             value={testDirection}
             onChange={(e) => setTestDirection(e.target.value as any)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-not-allowed"
+            disabled={true}
           >
             <option value="two-tail">Two-tailed</option>
             <option value="left-tail">Left-tailed</option>
