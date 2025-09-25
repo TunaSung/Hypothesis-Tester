@@ -1,3 +1,4 @@
+### 1. 匯入 csv 檔
 POST http://localhost:8080/api/dataset/upload
 Content-Type: multipart/form-data; boundary=MyBoundary
 
@@ -8,8 +9,8 @@ Content-Type: text/csv
 < ./sample.csv
 --MyBoundary--
 
-###
-GET http://localhost:8080/api/dataset/meta?id=2
+### 2. 搜尋 dataset
+GET http://localhost:8080/api/dataset/meta?id=6
 
 
 ### 3. AI 建議方法
