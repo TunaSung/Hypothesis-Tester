@@ -93,7 +93,7 @@ function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
               <li key={`menu-${section.id}`} className="text-center border-b last:border-0">
                 <Link
                   to={section.to}
-                  className="block text-xl sm:text-2xl font-bold py-3 sm:py-6 group-hover:text-white"
+                  className="block text-xl sm:text-2xl font-bold py-3 sm:py-6 hover:text-gray-400"
                   role="menuitem"
                   onClick={handleMenuOpen}
                 >
