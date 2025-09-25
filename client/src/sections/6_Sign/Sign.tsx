@@ -1,6 +1,6 @@
 function Sign(){
     return (
-        <section>
+        <section className="container-mid">
 
         </section>
     )

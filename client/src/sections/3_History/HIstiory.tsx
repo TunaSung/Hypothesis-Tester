@@ -1,6 +1,6 @@
 function History(){
     return (
-        <section>
+        <section className="container-mid">
 
         </section>
     )
