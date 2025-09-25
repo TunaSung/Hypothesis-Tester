@@ -13,7 +13,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 export async function uploadCSV(formData: FormData): Promise<UploadResp> {
   try {
-    const { data } = await api.post<UploadResp>("/api/dataset/upload", formData, {
+    const { data } = await api.post<UploadResp>("/dataset/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return data;
@@ -26,7 +26,7 @@ export async function uploadCSV(formData: FormData): Promise<UploadResp> {
 
 export async function aiSuggest(datasetId: number, question: string): Promise<SuggestResp> {
   try {
-    const { data } = await api.post<SuggestResp>("/api/analysis/suggest", {
+    const { data } = await api.post<SuggestResp>("/analysis/suggest", {
       datasetId,
       question,
     });
@@ -44,7 +44,7 @@ export async function runTest(
   args: Record<string, any>
 ): Promise<RunResp> {
   try {
-    const { data } = await api.post<RunResp>("/api/analysis/run", {
+    const { data } = await api.post<RunResp>("/analysis/run", {
       datasetId,
       method,
       args,
