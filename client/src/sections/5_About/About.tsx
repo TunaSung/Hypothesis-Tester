@@ -60,24 +60,6 @@ function About() {
       </section>
       {/* End Stats */}
 
-      {/* Start Contact */}
-      <section className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl p-12 text-center">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Get in Touch</h2>
-        <p className="text-slate-600 mb-6">
-          Have questions, feedback, or need help with your analysis? We'd love
-          to hear from you.
-        </p>
-        <div className="flex justify-center space-x-6">
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-            Contact Support
-          </button>
-          <button className="bg-slate-200 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-300 transition-colors">
-            Request Feature
-          </button>
-        </div>
-      </section>
-      {/* End Contact */}
-
     </div>
   );
 }

@@ -35,9 +35,6 @@ function Analyze() {
 
   // Settings
   const [significanceLevel, setSignificanceLevel] = useState(0.05);
-  const [testDirection, setTestDirection] = useState<
-    "two-tail" | "left-tail" | "right-tail"
-  >("two-tail");
 
   // Run / Result / Error
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -212,8 +209,6 @@ function Analyze() {
           <AnalysisSettings
             significanceLevel={significanceLevel}
             setSignificanceLevel={setSignificanceLevel}
-            testDirection={testDirection}
-            setTestDirection={setTestDirection}
           />
 
           <button
