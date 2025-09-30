@@ -1,45 +1,45 @@
 export const FEATURES = Object.freeze([
   {
-    title: "AI-Powered Test Selection",
+    title: "AI Test Suggestion",
     description:
-      "Advanced natural language processing to understand your research questions and recommend appropriate statistical tests.",
+      "Upload a CSV and describe your research question—Hypothesis Tester suggests the most suitable statistical test with a simple explanation.",
   },
   {
-    title: "Assumption Checking",
+    title: "Core Statistical Tests",
     description:
-      "Automated validation of statistical test assumptions with clear warnings and alternative suggestions.",
+      "Supports independent t-test, paired t-test, one-way ANOVA, and Pearson correlation. More methods like chi-square and regression are planned.",
   },
   {
-    title: "Interactive Visualizations",
+    title: "Assumption Awareness",
     description:
-      "Dynamic charts and plots that help you understand your data and results intuitively.",
+      "Includes basic checks like sample size requirements and Levene’s test for variance equality, so you know when assumptions may be violated.",
   },
   {
-    title: "Plain Language Explanations",
+    title: "Readable AI Summaries",
     description:
-      "Complex statistical concepts explained in clear, jargon-free language that anyone can understand.",
+      "Results are presented with effect sizes, confidence intervals, and plain-language summaries—making interpretation easier.",
   },
 ]);
 
 export const STATS = Object.freeze([
-    {
-        stat: "10,000+",
-        title: "Analyses Completed",
-        color: "text-blue-600"
-    },
-    {
-        stat: "95%",
-        title: "User Satisfaction",
-        color: "text-teal-600"
-    },
-    {
-        stat: "50+",
-        title: "Universities Using",
-        color: "text-purple-600"
-    },
-    {
-        stat: "24/7",
-        title: "Available",
-        color: "text-orange-600"
-    },
+  {
+    stat: "4",
+    title: "Statistical Tests Supported",
+    color: "text-blue-600",
+  },
+  {
+    stat: "100%",
+    title: "Open-Source Progress",
+    color: "text-teal-600",
+  },
+  {
+    stat: "2025",
+    title: "Project Started",
+    color: "text-purple-600",
+  },
+  {
+    stat: "∞",
+    title: "Learning & Improvements",
+    color: "text-orange-600",
+  },
 ]);

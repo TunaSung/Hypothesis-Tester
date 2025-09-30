@@ -1,31 +1,31 @@
 export const FEATURES = Object.freeze([
   {
     key: "auto-test",
-    title: "Automatic Test Selection",
+    title: "AI Test Suggestion",
     description:
-      "AI analyzes your data and question to recommend the most appropriate statistical test",
+      "Upload a CSV and describe your question—AI recommends a suitable statistical test with a short rationale.",
     icon: "🎯",
   },
   {
-    key: "plain-explain",
-    title: "Plain-Language Explanations",
+    key: "readable-summary",
+    title: "Readable AI Summaries",
     description:
-      "Complex statistical results explained in clear, understandable terms",
+      "Plain-language explanations of results with p-values, confidence intervals, and effect sizes.",
     icon: "💬",
   },
   {
-    key: "interactive-charts",
-    title: "Interactive Charts",
+    key: "assumption-aware",
+    title: "Assumption Awareness",
     description:
-      "Beautiful visualizations that help you understand your data and results",
-    icon: "📊",
+      "Basic checks (e.g., sample size hints, Levene’s test for equal variances) help you interpret results responsibly.",
+    icon: "🧪",
   },
   {
-    key: "export-share",
-    title: "Export & Share",
+    key: "csv-to-result",
+    title: "CSV → Result, Fast",
     description:
-      "Download results as Markdown reports or save charts as images",
-    icon: "📤",
+      "Simple CSV upload, stored metadata, and one-click runs for independent/paired t-test, one-way ANOVA, and correlation.",
+    icon: "⚡",
   },
 ]);
 
