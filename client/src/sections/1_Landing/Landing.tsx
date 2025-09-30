@@ -25,7 +25,8 @@ function Landing() {
         <Link
           to={'/analyze'}
           aria-label="Get started with statistical testing"
-          className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold cursor-pointer hover:from-blue-700 hover:to-teal-700 transition-all duration-250 shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transform"
+          className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold 
+          hover:from-blue-700 hover:to-teal-700 transition-all duration-250 shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transform"
         >
           Get Started
         </Link>
