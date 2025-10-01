@@ -140,118 +140,120 @@ function Analyze() {
   };
 
   return (
-    <div className="container-mid py-8">
+    <div className="bg-sky-100/40">
+      <div className="container-mid py-8">
+        {/* Start Header */}
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">
+            Analysis Workspace
+          </h1>
+          <p className="text-slate-600">
+            Upload your data and describe your research question to get started
+          </p>
+        </header>
+        {/* End Header */}
 
-      {/* Start Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">
-          Analysis Workspace
-        </h1>
-        <p className="text-slate-600">
-          Upload your data and describe your research question to get started
-        </p>
-      </header>
-      {/* End Header */}
-
-      <main className="grid lg:grid-cols-3 gap-8">
-        {/* Start Left */}
-        <section className="lg:col-span-2 space-y-6">
-          <UploadCard
-            isUploading={isUploading}
-            onPick={() => fileInputRef.current?.click()}
-            onFile={handleFileUpload}
-            datasetId={datasetId}
-            datasetName={datasetName}
-            columns={columns}
-            fileInputRef={fileInputRef}
-          />
-
-          <QuestionBox
-            question={question}
-            setQuestion={setQuestion}
-            onSuggest={handleSuggest}
-            disabled={!datasetId || !question.trim()}
-          />
-
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <h2 className="text-xl font-semibold text-slate-800 mb-4">
-              Variable Selection
-            </h2>
-            <MethodChooser
-              selectedMethod={selectedMethod}
-              setSelectedMethod={setSelectedMethod}
-              suggestedTest={suggestedTest}
-            />
-            <VariableSelector
-              method={selectedMethod}
+        <main className="grid lg:grid-cols-3 gap-8">
+          {/* Start Left */}
+          <section className="lg:col-span-2 space-y-6">
+            <UploadCard
+              isUploading={isUploading}
+              onPick={() => fileInputRef.current?.click()}
+              onFile={handleFileUpload}
+              datasetId={datasetId}
+              datasetName={datasetName}
               columns={columns}
-              groupKey={groupKey}
-              setGroupKey={setGroupKey}
-              valueKey={valueKey}
-              setValueKey={setValueKey}
-              preKey={preKey}
-              setPreKey={setPreKey}
-              postKey={postKey}
-              setPostKey={setPostKey}
-              xKey={xKey}
-              setXKey={setXKey}
-              yKey={yKey}
-              setYKey={setYKey}
+              fileInputRef={fileInputRef}
             />
-          </div>
-        </section>
-        {/* End Left */}
 
-        {/* Start Right */}
-        <section className="space-y-6">
-          <ErrorAlert message={errorMsg} />
+            <QuestionBox
+              question={question}
+              setQuestion={setQuestion}
+              onSuggest={handleSuggest}
+              disabled={!datasetId || !question.trim()}
+            />
 
-          <AnalysisSettings
-            significanceLevel={significanceLevel}
-            setSignificanceLevel={setSignificanceLevel}
-          />
-
-          <button
-            onClick={handleRunAnalysis}
-            disabled={isAnalyzing || !readyToRun}
-            className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isAnalyzing ? (
-              <div className="flex items-center justify-center space-x-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                <span>Running Analysis...</span>
-              </div>
-            ) : (
-              "Run Analysis"
-            )}
-          </button>
-
-          {result && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                <div className="text-sm text-slate-700 space-y-2">
-                  <div>
-                    <span className="font-medium">Method:</span> {result.method}
-                  </div>
-                  {result.aiSummary && (
-                    <div className="mt-3 p-3 rounded-lg bg-slate-50 text-slate-700">
-                      <div className="font-semibold mb-1">AI Summary</div>
-                      <div className="whitespace-pre-wrap">
-                        {result.aiSummary}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <ResultCard
-                result={result.result}
-                confidence={1 - significanceLevel}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <h2 className="text-xl font-semibold text-slate-800 mb-4">
+                Variable Selection
+              </h2>
+              <MethodChooser
+                selectedMethod={selectedMethod}
+                setSelectedMethod={setSelectedMethod}
+                suggestedTest={suggestedTest}
+              />
+              <VariableSelector
+                method={selectedMethod}
+                columns={columns}
+                groupKey={groupKey}
+                setGroupKey={setGroupKey}
+                valueKey={valueKey}
+                setValueKey={setValueKey}
+                preKey={preKey}
+                setPreKey={setPreKey}
+                postKey={postKey}
+                setPostKey={setPostKey}
+                xKey={xKey}
+                setXKey={setXKey}
+                yKey={yKey}
+                setYKey={setYKey}
               />
             </div>
-          )}
-        </section>
-        {/* End Right */}
-      </main>
+          </section>
+          {/* End Left */}
+
+          {/* Start Right */}
+          <section className="space-y-6">
+            <ErrorAlert message={errorMsg} />
+
+            <AnalysisSettings
+              significanceLevel={significanceLevel}
+              setSignificanceLevel={setSignificanceLevel}
+            />
+
+            <button
+              onClick={handleRunAnalysis}
+              disabled={isAnalyzing || !readyToRun}
+              className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isAnalyzing ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                  <span>Running Analysis...</span>
+                </div>
+              ) : (
+                "Run Analysis"
+              )}
+            </button>
+
+            {result && (
+              <div className="space-y-4">
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                  <div className="text-sm text-slate-700 space-y-2">
+                    <div>
+                      <span className="font-medium">Method:</span>{" "}
+                      {result.method}
+                    </div>
+                    {result.aiSummary && (
+                      <div className="mt-3 p-3 rounded-lg bg-slate-50 text-slate-700">
+                        <div className="font-semibold mb-1">AI Summary</div>
+                        <div className="whitespace-pre-wrap">
+                          {result.aiSummary}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <ResultCard
+                  result={result.result}
+                  confidence={1 - significanceLevel}
+                />
+              </div>
+            )}
+          </section>
+          {/* End Right */}
+        </main>
+      </div>
     </div>
   );
 }

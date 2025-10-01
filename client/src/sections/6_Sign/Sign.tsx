@@ -30,37 +30,39 @@ function Sign() {
   );
 
   return (
-    <div className="container-mid py-8 flex justify-center items-center">
-      <section
-        className="border border-slate-300 w-full max-w-md aspect-[4/5] bg-white rounded-2xl p-8 shadow-md"
-        aria-live="polite"
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          {authView === "signin" ? (
-            <motion.div
-              key="signin"
-              className="w-full h-full grid grid-rows-[1fr_auto]"
-              variants={variants}
-              initial="start"
-              animate="enter"
-              exit="exit"
-            >
-              <SignIn toggleAuthView={toggleAuthView} />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="signup"
-              className="w-full h-full grid grid-rows-[1fr_auto]"
-              variants={variants}
-              initial="start"
-              animate="enter"
-              exit="exit"
-            >
-              <SignUp toggleAuthView={toggleAuthView} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </section>
+    <div className="bg-sky-100/40">
+      <div className="container-mid py-8 flex justify-center items-center">
+        <main
+          className="border border-slate-300 w-full max-w-md aspect-[4/5] bg-white rounded-2xl p-8 shadow-md"
+          aria-live="polite"
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            {authView === "signin" ? (
+              <motion.div
+                key="signin"
+                className="w-full h-full grid grid-rows-[1fr_auto]"
+                variants={variants}
+                initial="start"
+                animate="enter"
+                exit="exit"
+              >
+                <SignIn toggleAuthView={toggleAuthView} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="signup"
+                className="w-full h-full grid grid-rows-[1fr_auto]"
+                variants={variants}
+                initial="start"
+                animate="enter"
+                exit="exit"
+              >
+                <SignUp toggleAuthView={toggleAuthView} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+      </div>
     </div>
   );
 }
