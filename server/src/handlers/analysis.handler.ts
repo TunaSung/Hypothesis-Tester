@@ -1,8 +1,9 @@
-import type { RequestHandler, Request, Response, NextFunction } from "express";
+import type { RequestHandler } from "express";
 import { Dataset, Analysis } from "../models/Association.js";
 import { readCSV } from "../services/csv.service.js";
 import { suggestMethod, explainResult } from "../services/ai.service.js";
 import { independentT, pairedT, anovaOneWay, correlation } from "../services/stat.service.js";
+import type { RunAnalysisBody } from "../schemas/analysis.shema.js";
 
 export const suggest: RequestHandler = async (req, res, next) => {
     try {
@@ -19,11 +20,11 @@ export const suggest: RequestHandler = async (req, res, next) => {
 
 export const runAnalysis: RequestHandler = async (req, res, next) => {
     try {
-      const { datasetId, method, args } = req.body as {
-        datasetId: number;
-        method: "independent_t" | "paired_t" | "anova" | "correlation";
-        args: Record<string, any>;
-      };
+      const userId = req.user?.id
+      if(!userId) {
+        return res.status(404).json({ message: "未登入" })
+      }
+      const { datasetId, method, args } = req.body as RunAnalysisBody
 
       const ds = await Dataset.findByPk(datasetId);
       if (!ds) throw { status: 404, message: "Dataset not found" };
@@ -53,7 +54,8 @@ export const runAnalysis: RequestHandler = async (req, res, next) => {
         method,
         input: JSON.stringify(args),
         result: JSON.stringify(result),
-        aiSummary
+        aiSummary,
+        userId
       });
 
       res.json({ id: rec.id, method, args, result, aiSummary });

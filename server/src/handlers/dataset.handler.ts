@@ -5,6 +5,11 @@ import { readCSV, getColumns } from "../services/csv.service.js";
 
 export const uploadDataset: RequestHandler = async (req, res, next) => {
   try {
+    const userId = req.user?.id
+    if(!userId) {
+      return res.status(404).json({ message: "未登入" })
+    }
+
     if (!req.file) throw { status: 400, message: "缺少 CSV 檔案" };
     const file = req.file;
     const rows = await readCSV(file.path);
@@ -13,7 +18,8 @@ export const uploadDataset: RequestHandler = async (req, res, next) => {
       filename: file.originalname,
       path: file.path,
       columns: JSON.stringify(columns),
-      nRows: rows.length
+      nRows: rows.length,
+      userId
     });
     res.json({ id: ds.id, filename: ds.filename, columns, nRows: ds.nRows });
   } catch (e) {

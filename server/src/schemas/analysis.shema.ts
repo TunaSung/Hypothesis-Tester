@@ -1,54 +1,72 @@
 import { z } from "zod";
 
-// ========== 建議方法（AI）用 ==========
+// suggest
+const base = {
+  datasetId: z.number().int().positive(),
+};
 export const suggestSchema = z.object({
-  // 驗證 req.body
   body: z.object({
-    // datasetId 必須是正整數
-    datasetId: z.number().int().positive(),
-
+    ...base,
     question: z.string().min(5)
-  }),
+  }).strict(),
 
-  // 驗證 req.query
-  // 使用 passthrough() → 接受任何查詢參數，不檢查、不刪除
-  query: z.object({}).passthrough(),
+  query: z.object({}).strict(),
 
-  // 驗證 req.params
-  params: z.object({}).passthrough()
+  params: z.object({}).strict()
 });
 
-// ========== 執行分析 ==========
+// analysis
+const ci = { ciLevel: z.number().min(0.8).max(0.999).optional() };
+
+const independentArgs = z.object({
+  groupKey: z.string(),
+  valueKey: z.string(),
+  ...ci,
+}).strict();
+
+const pairedArgs = z.object({
+  subjectKey: z.string(),
+  preKey: z.string(),
+  postKey: z.string(),
+  ...ci,
+}).strict();
+
+const anovaArgs = z.object({
+  groupKey: z.string(),
+  valueKey: z.string(),
+  ...ci,
+}).strict();
+
+const correlationArgs = z.object({
+  xKey: z.string(),
+  yKey: z.string(),
+  ...ci,
+}).strict();
+
 export const runAnalysisSchema = z.object({
-  // 驗證 req.body
-  body: z.object({
-    // datasetId 必須是正整數
-    datasetId: z.number().int().positive(),
-
-    method: z.enum(["independent_t","paired_t","anova","correlation"]),
-
-    // args: 額外參數
-    // - 不限定內容，允許任何 key-value 組合
-    // - ex: { groupKey, valueKey }（t-test）
-    // - ex: { xKey, yKey }（correlation）
-    args: z
-      .object({
-        // 依不同方法會用到不同鍵，為簡化先都 optional
-        groupKey: z.string().optional(),
-        valueKey: z.string().optional(),
-        subjectKey: z.string().optional(),
-        preKey: z.string().optional(),
-        postKey: z.string().optional(),
-        xKey: z.string().optional(),
-        yKey: z.string().optional(),
-        ciLevel: z.number().min(0.8).max(0.999).optional()
-      })
-      .passthrough()
-  }),
-
-  // 保留 query，允許任何參數
-  query: z.object({}).passthrough(),
-
-  // 保留 params，允許任何路由參數
-  params: z.object({}).passthrough()
+  body: z.discriminatedUnion("method", [
+    z.object({
+      ...base,
+      method: z.literal("independent_t"),
+      args: independentArgs,
+    }),
+    z.object({
+      ...base,
+      method: z.literal("paired_t"),
+      args: pairedArgs,
+    }),
+    z.object({
+      ...base,
+      method: z.literal("anova"),
+      args: anovaArgs,
+    }),
+    z.object({
+      ...base,
+      method: z.literal("correlation"),
+      args: correlationArgs,
+    }),
+  ]),
+  query: z.object({}).strict(),
+  params: z.object({}).strict(),
 });
+export type RunAnalysisBody = z.infer<typeof runAnalysisSchema>["body"]

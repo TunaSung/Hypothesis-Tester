@@ -8,6 +8,7 @@ export class Analysis extends Model<InferAttributes<Analysis>, InferCreationAttr
   declare input: string;         // JSON: 使用者指定欄位/群組
   declare result: string;        // JSON: 檢定結果（統計量、p、ci）
   declare aiSummary: string;     // AI 自然語言解釋
+  declare userId: number;
 }
 
 Analysis.init({
@@ -16,5 +17,6 @@ Analysis.init({
   method: { type: DataTypes.STRING, allowNull: false },
   input: { type: DataTypes.TEXT, allowNull: false },
   result: { type: DataTypes.TEXT, allowNull: false },
-  aiSummary: { type: DataTypes.TEXT, allowNull: false }
+  aiSummary: { type: DataTypes.TEXT, allowNull: false },
+  userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "user", key: "id" } }
 }, { sequelize: sqlize, modelName: "analyse", tableName: "analyses" });

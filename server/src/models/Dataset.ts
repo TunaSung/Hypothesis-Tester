@@ -7,6 +7,7 @@ export class Dataset extends Model<InferAttributes<Dataset>, InferCreationAttrib
   declare path: string;          // 伺服器存放路徑
   declare columns: string;       // JSON: 欄位名稱
   declare nRows: number;         // 資料列數
+  declare userId: number;
 }
 
 Dataset.init({
@@ -14,5 +15,6 @@ Dataset.init({
   filename: { type: DataTypes.STRING, allowNull: false },
   path: { type: DataTypes.STRING, allowNull: false },
   columns: { type: DataTypes.TEXT, allowNull: false },
-  nRows: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false }
+  nRows: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
+  userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "user", key: "id" } }
 }, { sequelize: sqlize, modelName:"dataset", tableName: "datasets" });
