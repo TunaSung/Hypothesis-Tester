@@ -44,9 +44,11 @@ export const signIn: RequestHandler = async (req, res) => {
         }
 
         const token = jwt.sign({ userId: user.id }, secret, { expiresIn: "3h" })
+        const refreshToken = jwt.sign({ userId: user.id }, secret, { expiresIn: "7d" })
         res.status(200).json({ 
             message: `Login successful`, 
             token, 
+            refreshToken,
             user: pickSafeUser(user) 
         })
     } catch (e) {
