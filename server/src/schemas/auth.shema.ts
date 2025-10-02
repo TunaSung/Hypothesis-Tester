@@ -9,7 +9,7 @@ export const signUpSchema = z.object({
     }).strict(),
 
     query: z.object({}).strict(),
-    param: z.object({}).strict()
+    params: z.object({}).strict()
 })
 export type SignUpBody = z.infer<typeof signUpSchema>["body"];
 
@@ -20,7 +20,7 @@ export const signInSchema = z.object({
     }).strict(),
 
     query: z.object({}).strict(),
-    param: z.object({}).strict()
+    params: z.object({}).strict()
 })
 export type SignInBody = z.infer<typeof signInSchema>["body"];
 
