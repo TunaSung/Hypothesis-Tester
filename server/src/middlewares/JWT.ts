@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express"
-import jwt, { TokenExpiredError, type JwtPayload } from "jsonwebtoken"
+import jwt, { type JwtPayload } from "jsonwebtoken"
 import "dotenv/config"
 import { User } from "../models/Association.js"
 
@@ -29,7 +29,7 @@ const authenticate: RequestHandler = async (req, res, next) => {
         req.user = user
         next()
     } catch (error) {
-        if (error instanceof TokenExpiredError) {
+        if (error instanceof jwt.TokenExpiredError) {
             return res.status(401).json({ message: "身份驗證令牌已過期" });
         }
         return res.status(401).json({ message: "無效的身份驗證令牌" });
