@@ -2,8 +2,12 @@ import StepCard from "./components/StepCard";
 import FeatureCard from "./components/FeatureCard";
 import { FEATURES, STEPS } from "./datas/Landing.data";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../components/Context/authContext";
 
 function Landing() {
+
+  const { isAuthenticated } = useAuth()
+
   return (
     <div className="bg-sky-100/40">
       <div aria-labelledby="landing-hero-title" className="container-mid py-16">
@@ -21,7 +25,7 @@ function Landing() {
             beautiful visualizations.
           </p>
           <Link
-            to={"/analyze"}
+            to={isAuthenticated ? "/analyze" : "/sign"}
             aria-label="Get started with statistical testing"
             className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold 
             hover:from-blue-700 hover:to-teal-700 transition-all duration-250 shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transform"

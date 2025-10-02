@@ -7,7 +7,7 @@ import { ResultCard } from "./components/ResultCard";
 import { UploadCard } from "./components/UploadCard";
 import { VariableSelector } from "./components/VariableSelector";
 
-import { uploadCSV, aiSuggest, runTest } from "./services/Analyze.service";
+import { uploadCSV, aiSuggest, runTest } from "../../service/Analyze.service";
 import type { Method, RunResp, SuggestResp } from "../../types/Analyze";
 
 function Analyze() {

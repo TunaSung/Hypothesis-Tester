@@ -1,7 +1,11 @@
-import { useCallback, useState, type ChangeEvent } from "react";
+import { useCallback, useState, type ChangeEvent, type FormEvent } from "react";
 import FloatingField from "./FloatingField";
 import { IoPersonOutline } from "react-icons/io5";
 import { TbLockPassword } from "react-icons/tb";
+import { toast } from "react-toastify";
+import { signIn } from "../../../service/auth.service";
+import { useAuth } from "../../../components/Context/authContext";
+import { useNavigate } from "react-router-dom";
 
 type SignInProps = {
   toggleAuthView: () => void;
@@ -14,6 +18,9 @@ type FormState = {
 
 function SignIn({ toggleAuthView }: SignInProps) {
   const [form, setForm] = useState<FormState>({ email: "", password: "" });
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const { login } = useAuth()
 
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) =>
@@ -21,9 +28,37 @@ function SignIn({ toggleAuthView }: SignInProps) {
     []
   );
 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if(loading) return
+
+    const email = form.email.trim().toLowerCase();
+    const password = form.password;
+
+    if (!email || !password) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    try {
+      setLoading(true)
+      const res = await signIn(email, password)
+      login(res.token)
+      toast.success("Sign in successful");
+      navigate("/")
+    } catch (err) {
+      toast.error("Sign in failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <>
-      <form className="flex flex-col justify-center gap-6">
+      <form
+      onSubmit={handleSubmit}
+      className="flex flex-col justify-center gap-6">
         <FloatingField
           icon={IoPersonOutline}
           label="Email"

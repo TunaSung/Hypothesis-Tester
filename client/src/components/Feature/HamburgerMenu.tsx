@@ -1,21 +1,25 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { NavItem } from "../../types/NavType";
-import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from 'framer-motion'
+import { NavLink } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { SlMenu } from "react-icons/sl";
 
 interface HamburgerMenuProps {
-  sectionList: NavItem[]
+  sectionList: NavItem[];
 }
 
 function useOutsideClick<T extends HTMLElement | null>(
-  ref: React.RefObject<T>, 
+  ref: React.RefObject<T>,
   handler: (ev: MouseEvent) => void
 ) {
   useEffect(() => {
     const listener = (event: MouseEvent) => {
-      const el = ref.current
-      if (el && el instanceof HTMLElement && !el.contains(event.target as Node)) {
+      const el = ref.current;
+      if (
+        el &&
+        el instanceof HTMLElement &&
+        !el.contains(event.target as Node)
+      ) {
         handler(event);
       }
     };
@@ -29,7 +33,7 @@ function useOutsideClick<T extends HTMLElement | null>(
 function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
   // State: controls whether the menu is open
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Ref: tracks the component container for outside click detection
   const containerRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
@@ -67,6 +71,17 @@ function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
   // Attach the outside click listener
   useOutsideClick(containerRef, handleOutsideClick);
 
+  const handleItemClick = useCallback(
+    (func: () => void) => () => {
+      try {
+        func();
+      } finally {
+        setIsOpen(false);
+      }
+    },
+    []
+  );
+
   return (
     <div ref={containerRef} className="flex justify-center items-center">
       {/* Start menu icon btn */}
@@ -82,23 +97,38 @@ function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
       {/* Start menu list */}
       <AnimatePresence>
         {isOpen && (
-          <motion.ul role="menu" 
-          className="fixed w-full px-5 sm:px-10 flex flex-col top-full right-0 border rounded-2xl rounded-t-none bg-slate-100/95 backdrop-blur-sm border-slate-200 group"
-          initial={{ clipPath: "inset(0% 0% 100% 100%)" }} // inset(T R B L)
-          animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-          exit={{ clipPath: "inset(0% 0% 100% 100%)" }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+          <motion.ul
+            role="menu"
+            className="fixed w-full px-5 sm:px-10 flex flex-col top-full right-0 border rounded-2xl rounded-t-none bg-slate-100/95 backdrop-blur-sm border-slate-200 group"
+            initial={{ clipPath: "inset(0% 0% 100% 100%)" }} // inset(T R B L)
+            animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+            exit={{ clipPath: "inset(0% 0% 100% 100%)" }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            {sectionList.map((section) => (
-              <li key={`menu-${section.id}`} className="text-center border-b last:border-0">
-                <Link
-                  to={section.to}
-                  className="block text-xl sm:text-2xl font-bold py-3 sm:py-6 hover:text-gray-400"
-                  role="menuitem"
-                  onClick={handleMenuOpen}
-                >
-                  {section.label}
-                </Link>
+            {sectionList.map((item) => (
+              <li
+                key={`menu-${item.id}`}
+                className="text-center border-b last:border-0"
+              >
+                {item.onClick ? (
+                  <button
+                    type="button"
+                    onClick={handleItemClick(item.onClick)}
+                    className="text-xl sm:text-2xl font-bold py-3 sm:py-6 hover:text-red-400"
+                    role="menuitem"
+                  >
+                    {item.label}
+                  </button>
+                ) : (
+                  <NavLink
+                    to={item.to}
+                    onClick={() => setIsOpen(false)}
+                    className="block text-xl sm:text-2xl font-bold py-3 sm:py-6 hover:text-gray-400"
+                    role="menuitem"
+                  >
+                    {item.label}
+                  </NavLink>
+                )}
               </li>
             ))}
           </motion.ul>

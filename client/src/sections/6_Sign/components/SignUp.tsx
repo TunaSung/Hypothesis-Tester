@@ -1,9 +1,11 @@
-import { useCallback, useState, type ChangeEvent } from "react";
+import { useCallback, useState, type ChangeEvent, type FormEvent } from "react";
 import FloatingField from "./FloatingField";
 import { IoPersonOutline } from "react-icons/io5";
 import { TbLockPassword } from "react-icons/tb";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdOutlineDriveFileRenameOutline } from "react-icons/md";
+import { toast } from "react-toastify";
+import { signUp } from "../../../service/auth.service";
 
 type SignUpProps = {
   toggleAuthView: () => void;
@@ -24,15 +26,56 @@ function SignUp({ toggleAuthView }: SignUpProps) {
     confirm: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const onChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) =>
       setForm((prev) => ({ ...prev, [e.target.name]: e.target.value })),
     []
   );
 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (loading) return;
+    const username = form.username.trim();
+    const email = form.email.trim().toLowerCase();
+    const password = form.password;
+    const confirm = form.confirm;
+
+    if (!username || !email || !password || !confirm) {
+      toast.error("All fields are required");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    if (password !== confirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await signUp(username, email, password);
+      toast.success("Sign up successful");
+      // 清表單並切回登入畫面
+      setForm({ username: "", email: "", password: "", confirm: "" });
+      toggleAuthView();
+    } catch (err) {
+      toast.error("Sign up failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
-      <form className="flex flex-col justify-center gap-6">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col justify-center gap-6"
+      >
         <FloatingField
           icon={MdOutlineDriveFileRenameOutline}
           label="Username"
