@@ -11,7 +11,7 @@ const authenticate: RequestHandler = async (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({ message: "為提供身份證令牌" });
+            return res.status(401).json({ message: "未提供身份證令牌" });
         }
 
         const secret = process.env.JWT_SECRET
