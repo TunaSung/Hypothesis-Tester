@@ -10,7 +10,7 @@ Content-Type: text/csv
 --MyBoundary--
 
 ### 2. 搜尋 dataset
-GET http://localhost:8080/api/dataset/meta?id=6
+GET http://localhost:8080/api/dataset/meta?id=1
 
 
 ### 3. AI 建議方法
@@ -27,7 +27,7 @@ POST http://localhost:8080/api/analysis/run
 Content-Type: application/json
 
 {
-  "datasetId": 3,
+  "datasetId": 1,
   "method": "independent_t",
   "args": {
     "groupKey": "group",
@@ -41,7 +41,7 @@ POST http://localhost:8080/api/analysis/run
 Content-Type: application/json
 
 {
-  "datasetId": 3,
+  "datasetId": 1,
   "method": "paired_t",
   "args": {
     "preKey": "pre",
@@ -55,7 +55,7 @@ POST http://localhost:8080/api/analysis/run
 Content-Type: application/json
 
 {
-  "datasetId": 3,
+  "datasetId": 1,
   "method": "anova",
   "args": {
     "groupKey": "grp",
@@ -94,3 +94,7 @@ Content-Type: application/json
   "email": "ytsung99@gmail.com",
   "password": "20011107ryan"
 }
+
+### 登入
+GET http://localhost:8080/api/auth/history
+Content-Type: application/json
