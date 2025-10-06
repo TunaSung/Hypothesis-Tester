@@ -11,10 +11,10 @@ export class Dataset extends Model<InferAttributes<Dataset>, InferCreationAttrib
 }
 
 Dataset.init({
-  id: { type: DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   filename: { type: DataTypes.STRING, allowNull: false },
   path: { type: DataTypes.STRING, allowNull: false },
   columns: { type: DataTypes.TEXT, allowNull: false },
   nRows: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
-  userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "user", key: "id" } }
-}, { sequelize: sqlize, modelName:"dataset", tableName: "datasets" });
+  userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "users", key: "id" } }
+}, { sequelize: sqlize, modelName:"dataset", tableName: "datasets", timestamps: true });
