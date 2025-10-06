@@ -20,7 +20,7 @@ function Navbar() {
   const NAV_ITEMS: NavItem[] = useMemo(
     () => [
       { id: "analyze", label: "Analyze", to: isAuthenticated ? "/analyze" : "/sign" },
-      { id: "history", label: "History", to: "/history" },
+      { id: "history", label: "History", to: isAuthenticated ? "/history" : "/sign" },
       { id: "docs", label: "Docs", to: "/docs" },
       { id: "about", label: "About", to: "/about" },
 
