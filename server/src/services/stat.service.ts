@@ -10,7 +10,7 @@ const jStat: any =
 
 
 /** ---------- Types ---------- **/
-// Record<K, T> 是 TypeScript 中的一種內建泛型工具類型，用來定義一個物件，其鍵的型別為 K，值的型別為 T
+// Record<K, T> 用來定義一個物件，鍵的型別為 K，值的型別為 T
 type Rows = Record<string, string | number>[]
 
 type CI = {
@@ -31,7 +31,7 @@ type CI = {
 function groupBy<T extends Record<string, any>>(rows: T[], key: string): Record<string, T[]> {
   return rows.reduce((acc, r) => {
     const k = String(r[key]);
-    (acc[k] ||= []).push(r);  
+    (acc[k] ||= []).push(r);
     // acc[k] ||= [] 
     // acc 裡沒有 key 值 k 的話，在 acc 裡建一個 key 值，並先附值為 []
     // 等同於 if(!acc[k]) acc[k] = []
@@ -72,11 +72,11 @@ function toNum(x: string | number | undefined): number {
 
 /**
  * 兩獨立樣本 t 檢定（等變異假設, pooled-variance）
- * - 輸出 t/df/p、兩組的大小與平均、Levene 等變異檢定、Cohen's d 與差異的 CI。
- * @param rows    資料列（每列為物件）
+ * - t/df/p、兩組的大小與平均、Levene 等變異檢定、Cohen's d 與差異的 CI。
+ * @param rows     資料列 (object)
  * @param groupKey 群組欄位名
  * @param valueKey 數值欄位名
- * @param ciLevel 信賴水準，預設 0.95
+ * @param ciLevel  信賴水準，預設 0.95
  */
 export function independentT(
   rows: Rows,
@@ -130,7 +130,7 @@ export function independentT(
 
 /**
  * paired t-test
- * - 輸出 t/df/p、差值平均、Cohen's dz、差值的 CI。
+ * - t/df/p、差值平均、Cohen's dz、差值的 CI。
  * @param preKey  前測欄位
  * @param postKey 後測欄位
  */
@@ -163,7 +163,7 @@ export function pairedT(
 
 /**
  * 單因子 ANOVA
- * 回傳每組平均、樣本數、效果量 η² 與其保守 CI 近似。
+ * 每組平均、樣本數、效果量 η² 與其保守 CI 近似。
  */
 export function anovaOneWay(
   rows: Rows,
@@ -199,9 +199,10 @@ export function anovaOneWay(
   const F = msw === 0 ? Infinity : msb / msw;
   const p = msw === 0 ? 0 : 1 - jStat.centralF.cdf(F, dfb, dfw);
 
-  // 效果量 η² 及其保守 CI
+  // 效果量 η² (類似迴歸的 R²)
   const sst = ssb + ssw;
   const eta2 = sst === 0 ? 0 : ssb / sst;
+  
   // 粗略近似：方便先有 CI
   const varEta2Approx = (2 * (eta2 ** 2) * (dfw ** 2 + (k - 1) ** 2)) / ((N ** 2) * (k - 1) ** 2);
   const z = zScore(0.5 + (ciLevel / 2));
@@ -212,7 +213,7 @@ export function anovaOneWay(
   };
 
   return {
-    F, dfb, dfw, p,
+    statistic: F, dfb, dfw, p,
     groupMeans: Object.fromEntries(labels.map((l, i) => [l, groupMeans[i]])),
     sizes: Object.fromEntries(labels.map((l, i) => [l, groups[i]!.length])),
     effectSize: { eta2 },
