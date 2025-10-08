@@ -8,19 +8,27 @@ import { useAuth } from "../Context/authContext";
 function Navbar() {
   const isWidth768 = useMediaQuery({ minWidth: 768 });
 
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, logout } = useAuth();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSignOut = () => {
-    logout()
-    navigate("/", { replace: true })
+    logout();
+    navigate("/", { replace: true });
   };
 
   const NAV_ITEMS: NavItem[] = useMemo(
     () => [
-      { id: "analyze", label: "Analyze", to: isAuthenticated ? "/analyze" : "/sign" },
-      { id: "history", label: "History", to: isAuthenticated ? "/history" : "/sign" },
+      {
+        id: "analyze",
+        label: "Analyze",
+        to: isAuthenticated ? "/analyze" : "/sign",
+      },
+      {
+        id: "history",
+        label: "History",
+        to: isAuthenticated ? "/history" : "/sign",
+      },
       { id: "docs", label: "Docs", to: "/docs" },
       { id: "about", label: "About", to: "/about" },
 
@@ -35,7 +43,6 @@ function Navbar() {
     <nav className="sticky top-0 w-full py-0 sm:py-3 bg-white/80 backdrop-blur-sm border-b border-slate-200 z-50">
       <div className="container-mid sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-
           {/* Start home page btn */}
           <Link
             to="/"
@@ -52,9 +59,9 @@ function Navbar() {
           {/* End home page btn */}
 
           {/* Start nav item */}
-          {!isWidth768 ?
-            <HamburgerMenu sectionList={NAV_ITEMS}/>
-            :
+          {!isWidth768 ? (
+            <HamburgerMenu sectionList={NAV_ITEMS} />
+          ) : (
             <ul className="flex items-center space-x-8">
               {NAV_ITEMS.map((item) => (
                 <li key={item.id}>
@@ -69,9 +76,7 @@ function Navbar() {
                   ) : (
                     <NavLink
                       to={item.to}
-                      className={
-                        `text-[#475569] hover:text-blue-600 transition-colors duration-400`
-                      }
+                      className={`text-[#475569] hover:text-blue-600 transition-colors duration-400`}
                     >
                       {item.label}
                     </NavLink>
@@ -79,9 +84,8 @@ function Navbar() {
                 </li>
               ))}
             </ul>
-          }
+          )}
           {/* End nav item */}
-          
         </div>
       </div>
     </nav>

@@ -1,22 +1,23 @@
-import express from "express"
-import cors from "cors"
-import 'dotenv/config'
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
 
-import "./models/Association.js"
+import "./models/Association.js";
 import datasetRouter from "./routes/dataset.route.js";
 import analysisRouter from "./routes/analysis.route.js";
-import authRouter from "./routes/auth.route.js"
+import authRouter from "./routes/auth.route.js";
 import { errorHandler } from "./middlewares/error.js";
 import { sqlize } from "./config/db.js";
 
+const app = express();
 
-const app = express()
-
-const origins = (process.env.CORS_ORIGINS || "http://localhost:5173").split(",");
+const origins = (process.env.CORS_ORIGINS || "http://localhost:5173").split(
+  ","
+);
 
 const corsOptions = {
   origin: origins,
-  credentials: true
+  credentials: true,
 };
 
 app.use(cors(corsOptions)); // 全域套用
@@ -29,12 +30,12 @@ app.use("/api/analysis", analysisRouter);
 app.use("/api/auth", authRouter);
 
 sqlize.sync().then(() => {
-    console.log("資料庫已同步");
+  console.log("資料庫已同步");
 });
 
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3030;
 app.listen(PORT, () => {
-    console.log(`Running on ${PORT}`)
-})
+  console.log(`Running on ${PORT}`);
+});

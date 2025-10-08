@@ -5,8 +5,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../components/Context/authContext";
 
 function Landing() {
-
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="bg-sky-100/40">

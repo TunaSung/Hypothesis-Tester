@@ -1,4 +1,9 @@
-export type Method ="" | "independent_t" | "paired_t" | "anova" | "correlation";
+export type Method =
+  | ""
+  | "independent_t"
+  | "paired_t"
+  | "anova"
+  | "correlation";
 
 export type SuggestResp = {
   method: Method;
@@ -15,9 +20,9 @@ export type RunResp = {
 };
 
 export type RunApiRes = {
-  message: string
-  result: RunResp
-}
+  message: string;
+  result: RunResp;
+};
 
 export type UploadResp = {
   id: number;
@@ -26,19 +31,22 @@ export type UploadResp = {
   nRows: number;
 };
 
-
 // History
-export type KnownMethod = "correlation" | "anova" | "independent_t" | "paired_t"
+export type KnownMethod =
+  | "correlation"
+  | "anova"
+  | "independent_t"
+  | "paired_t";
 
 export type HistoryItemRaw = {
-  id: number
-  datasetId: number
-  method: KnownMethod | string
-  input: string
-  result: string
-  aiSummary: string
-  createdAt: string
-  dataset: { filename: string }
+  id: number;
+  datasetId: number;
+  method: KnownMethod | string;
+  input: string;
+  result: string;
+  aiSummary: string;
+  createdAt: string;
+  dataset: { filename: string };
 };
 
 export type GetHistoryApiRespRaw = {
@@ -47,11 +55,11 @@ export type GetHistoryApiRespRaw = {
 };
 
 export type HistoryItem = Omit<HistoryItemRaw, "input" | "result"> & {
-  input: Record<string, unknown>
-  result: Record<string, unknown>
+  input: Record<string, unknown>;
+  result: Record<string, unknown>;
 };
 
 export type GetHistoryApiResp = {
-  message: string
-  history: HistoryItem[]
+  message: string;
+  history: HistoryItem[];
 };

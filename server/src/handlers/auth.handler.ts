@@ -1,77 +1,96 @@
-import type { RequestHandler } from "express"
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
-import "dotenv/config"
-import { User } from "../models/Association.js"
-import type { SignInBody, SignUpBody, RefreshTokenBody, /*ForgotPasswordBody*/ } from "../schemas/auth.schema.js"
+import type { RequestHandler } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
+import { User } from "../models/Association.js";
+import type {
+  SignInBody,
+  SignUpBody,
+  RefreshTokenBody /*ForgotPasswordBody*/,
+} from "../schemas/auth.schema.js";
 
-function pickSafeUser<T extends { get?: (opts?: any) => any; password?: string }>(u: T) {
-    const plain = typeof u?.get === "function" ? u.get({ plain: true }) : (u as any);
-    const { password, ...rest } = plain ?? {};
-    return rest as Omit<typeof plain, "password">;
+function pickSafeUser<
+  T extends { get?: (opts?: any) => any; password?: string }
+>(u: T) {
+  const plain =
+    typeof u?.get === "function" ? u.get({ plain: true }) : (u as any);
+  const { password, ...rest } = plain ?? {};
+  return rest as Omit<typeof plain, "password">;
 }
 
-
 export const signUp: RequestHandler = async (req, res, next) => {
-    try {
-        const { username, email, password } = req.body as SignUpBody;
-        const normalizedEmail = email.toLowerCase().trim()
-        const hashedPassword = await bcrypt.hash(password, 12)
+  try {
+    const { username, email, password } = req.body as SignUpBody;
+    const normalizedEmail = email.toLowerCase().trim();
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-        const newUser = await User.create({ username, email: normalizedEmail, password: hashedPassword })
-        res.status(201).json({
-            message: 'sign up successful',
-            user: pickSafeUser(newUser)
-        })
-    } catch (e: any) {
-        if (e?.name === "SequelizeUniqueConstraintError") {
-            return res.status(409).json({ error: "Email already in use" });
-        }
-        next(e);
+    const newUser = await User.create({
+      username,
+      email: normalizedEmail,
+      password: hashedPassword,
+    });
+    res.status(201).json({
+      message: "sign up successful",
+      user: pickSafeUser(newUser),
+    });
+  } catch (e: any) {
+    if (e?.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({ error: "Email already in use" });
     }
+    next(e);
+  }
 };
 
 export const signIn: RequestHandler = async (req, res) => {
-    try {
-        const { email, password } = req.body as SignInBody;
-        const normalizedEmail = email.toLowerCase().trim()
+  try {
+    const { email, password } = req.body as SignInBody;
+    const normalizedEmail = email.toLowerCase().trim();
 
-        const user = await User.findOne({ where: { email: normalizedEmail } })
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ error: 'Wrong email or password' })
-        }
-
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: "3h" })
-        const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_SECRET!, { expiresIn: "7d" })
-
-        res.status(200).json({
-            message: `Login successful`,
-            token,
-            refreshToken,
-            user: pickSafeUser(user)
-        })
-    } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : String(e)
-        res.status(500).json({
-            error: 'Login failed',
-            details: errorMessage
-        })
+    const user = await User.findOne({ where: { email: normalizedEmail } });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: "Wrong email or password" });
     }
-}
+
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+      expiresIn: "3h",
+    });
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      process.env.REFRESH_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: `Login successful`,
+      token,
+      refreshToken,
+      user: pickSafeUser(user),
+    });
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    res.status(500).json({
+      error: "Login failed",
+      details: errorMessage,
+    });
+  }
+};
 
 export const refreshToken: RequestHandler = async (req, res) => {
-    const { refreshToken } = req.body as RefreshTokenBody;
-    if (!refreshToken) return res.status(400).json({ error: "Missing refresh token" })
+  const { refreshToken } = req.body as RefreshTokenBody;
+  if (!refreshToken)
+    return res.status(400).json({ error: "Missing refresh token" });
 
-    const secret = process.env.REFRESH_SECRET!;
-    try {
-        const decoded = jwt.verify(refreshToken, secret) as { userId: number };
-        const token = jwt.sign({ userId: decoded.userId }, secret, { expiresIn: "3h" });
-        return res.json({ token });
-    } catch {
-        return res.status(401).json({ error: "Invalid refresh token" });
-    }
-}
+  const secret = process.env.REFRESH_SECRET!;
+  try {
+    const decoded = jwt.verify(refreshToken, secret) as { userId: number };
+    const token = jwt.sign({ userId: decoded.userId }, secret, {
+      expiresIn: "3h",
+    });
+    return res.json({ token });
+  } catch {
+    return res.status(401).json({ error: "Invalid refresh token" });
+  }
+};
 
 // export const forgotPassword: RequestHandler = async (req, res) => {
 //     const { email } = req.body as ForgotPasswordBody;

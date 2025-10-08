@@ -8,16 +8,15 @@ const jStat: any =
   // 直接用 namespace（最後手段）
   (jstatNs as any);
 
-
 /** ---------- Types ---------- **/
 // Record<K, T> 用來定義一個物件，鍵的型別為 K，值的型別為 T
-type Rows = Record<string, string | number>[]
+type Rows = Record<string, string | number>[];
 
 type CI = {
-  level: number
-  lower: number
-  upper: number
-}
+  level: number;
+  lower: number;
+  upper: number;
+};
 
 /** ---------- Utilities ---------- **/
 
@@ -28,20 +27,23 @@ type CI = {
  * groupBy([{g:'A',x:1},{g:'B',x:2},{g:'A',x:3}], 'g')
  *  => { A:[{...},{...}], B:[{...}] }
  */
-function groupBy<T extends Record<string, any>>(rows: T[], key: string): Record<string, T[]> {
+function groupBy<T extends Record<string, any>>(
+  rows: T[],
+  key: string
+): Record<string, T[]> {
   return rows.reduce((acc, r) => {
     const k = String(r[key]);
     (acc[k] ||= []).push(r);
-    // acc[k] ||= [] 
+    // acc[k] ||= []
     // acc 裡沒有 key 值 k 的話，在 acc 裡建一個 key 值，並先附值為 []
     // 等同於 if(!acc[k]) acc[k] = []
     return acc;
   }, {} as Record<string, T[]>);
 }
 
-/** 
- * Z score 
- * p ∈ (0,1) 
+/**
+ * Z score
+ * p ∈ (0,1)
  * @example
  * zScore(0.975)
  * 1.96
@@ -62,9 +64,11 @@ function clamp01(x: number) {
  * 發現髒資料時丟出 400 錯誤，方便 API 直接回覆前端。
  */
 function toNum(x: string | number | undefined): number {
-  if (x === undefined || x === null) throw { status: 400, code: "MISSING_VALUE", message: "數值欄位缺失" };
+  if (x === undefined || x === null)
+    throw { status: 400, code: "MISSING_VALUE", message: "數值欄位缺失" };
   const v = Number(x);
-  if (!Number.isFinite(v)) throw { status: 400, code: "NOT_NUMERIC", message: `非數值輸入: ${x}` };
+  if (!Number.isFinite(v))
+    throw { status: 400, code: "NOT_NUMERIC", message: `非數值輸入: ${x}` };
   return v;
 }
 
@@ -82,39 +86,56 @@ export function independentT(
   rows: Rows,
   args: { groupKey: string; valueKey: string; ciLevel?: number }
 ) {
-  const { groupKey, valueKey } = args
-  const ciLevel = args.ciLevel ?? 0.95
+  const { groupKey, valueKey } = args;
+  const ciLevel = args.ciLevel ?? 0.95;
 
   // 分組
-  const g = groupBy(rows, groupKey)
-  const keys = Object.keys(g)
+  const g = groupBy(rows, groupKey);
+  const keys = Object.keys(g);
   if (keys.length !== 2)
-    throw { status: 400, code: "NEED_2_GROUPS", message: "independent_t 需要兩組" }
+    throw {
+      status: 400,
+      code: "NEED_2_GROUPS",
+      message: "independent_t 需要兩組",
+    };
 
-  const [A, B] = keys as [string, string]
-  if (!g[A] || !g[B]) throw { status: 400, code: "GROUP_UNDEFINED", message: "分組不存在" }
+  const [A, B] = keys as [string, string];
+  if (!g[A] || !g[B])
+    throw { status: 400, code: "GROUP_UNDEFINED", message: "分組不存在" };
 
   // 取出兩組數值並轉 number
-  const a = g[A].map(r => toNum(r[valueKey]))
-  const b = g[B].map(r => toNum(r[valueKey]))
-  const na = a.length, nb = b.length
-  if (na < 2 || nb < 2) throw { status: 400, code: "SMALL_N", message: "每組至少 n≥2" }
+  const a = g[A].map((r) => toNum(r[valueKey]));
+  const b = g[B].map((r) => toNum(r[valueKey]));
+  const na = a.length,
+    nb = b.length;
+  if (na < 2 || nb < 2)
+    throw { status: 400, code: "SMALL_N", message: "每組至少 n≥2" };
 
   // 基本統計量
-  const ma = ss.mean(a), mb = ss.mean(b)
-  const sva = ss.sampleVariance(a), svb = ss.sampleVariance(b)
-  const df = na + nb - 2
+  const ma = ss.mean(a),
+    mb = ss.mean(b);
+  const sva = ss.sampleVariance(a),
+    svb = ss.sampleVariance(b);
+  const df = na + nb - 2;
 
   // pooled 標準誤 & 檢定統計量
-  const sp2 = ((na - 1) * sva + (nb - 1) * svb) / df
-  const se = Math.sqrt(sp2 * (1 / na + 1 / nb))
-  const t = se === 0 ? 0 : (ma - mb) / se
-  const p = se === 0 ? 1 : 2 * (1 - jStat.studentt.cdf(Math.abs(t), df))
+  const sp2 = ((na - 1) * sva + (nb - 1) * svb) / df;
+  const se = Math.sqrt(sp2 * (1 / na + 1 / nb));
+  const t = se === 0 ? 0 : (ma - mb) / se;
+  const p = se === 0 ? 1 : 2 * (1 - jStat.studentt.cdf(Math.abs(t), df));
 
   // 假設檢定（等變異性） & 效應量 & 信賴區間
-  const levene = leveneTest(rows, { groupKey, valueKey })  // {F, df1, df2, p}
-  const d = cohensD_independent(a, b)  // Cohen's d
-  const ci = ciForMeanDiff_independent({ ma, mb, sp2, na, nb, df, level: ciLevel });
+  const levene = leveneTest(rows, { groupKey, valueKey }); // {F, df1, df2, p}
+  const d = cohensD_independent(a, b); // Cohen's d
+  const ci = ciForMeanDiff_independent({
+    ma,
+    mb,
+    sp2,
+    na,
+    nb,
+    df,
+    level: ciLevel,
+  });
 
   return {
     t,
@@ -142,9 +163,10 @@ export function pairedT(
   const ciLevel = args.ciLevel ?? 0.95;
 
   // 差值向量 d
-  const dvals = rows.map(r => toNum(r[postKey]) - toNum(r[preKey]));
+  const dvals = rows.map((r) => toNum(r[postKey]) - toNum(r[preKey]));
   const n = dvals.length;
-  if (n < 2) throw { status: 400, code: "SMALL_N", message: "paired_t 需要 n≥2" };
+  if (n < 2)
+    throw { status: 400, code: "SMALL_N", message: "paired_t 需要 n≥2" };
 
   // 統計量
   const md = ss.mean(dvals);
@@ -165,7 +187,7 @@ export function pairedT(
     effectSize: { cohenDz: dz },
     df,
     meanDiff: md,
-    n
+    n,
   };
 }
 
@@ -185,25 +207,35 @@ export function anovaOneWay(
   const labels = Object.keys(g);
 
   // 各組資料（轉 number），以及組數檢查
-  const groups: number[][] = labels.map(l => g[l]!.map(r => toNum(r[valueKey])));
+  const groups: number[][] = labels.map((l) =>
+    g[l]!.map((r) => toNum(r[valueKey]))
+  );
   const k = groups.length;
-  if (k < 2) throw { status: 400, code: "NEED_2_GROUPS", message: "anova 需要至少兩組" };
+  if (k < 2)
+    throw { status: 400, code: "NEED_2_GROUPS", message: "anova 需要至少兩組" };
 
   // 基本量
   const all: number[] = groups.flat();
   const N = all.length;
   const grand = ss.mean(all);
-  const groupMeans: number[] = groups.map(grp => ss.mean(grp));
+  const groupMeans: number[] = groups.map((grp) => ss.mean(grp));
 
   // SS_between / SS_within
-  const ssb = groups.reduce((acc, grp, i) => acc + grp.length * (groupMeans[i]! - grand) ** 2, 0);
-  const ssw = groups.reduce((acc, grp, i) =>
-    acc + grp.reduce((a, v) => a + (v - groupMeans[i]!) ** 2, 0), 0);
+  const ssb = groups.reduce(
+    (acc, grp, i) => acc + grp.length * (groupMeans[i]! - grand) ** 2,
+    0
+  );
+  const ssw = groups.reduce(
+    (acc, grp, i) =>
+      acc + grp.reduce((a, v) => a + (v - groupMeans[i]!) ** 2, 0),
+    0
+  );
 
   // F and p
   const dfb = k - 1;
   const dfw = N - k;
-  const msb = ssb / dfb, msw = ssw / dfw;
+  const msb = ssb / dfb,
+    msw = ssw / dfw;
   const F = msw === 0 ? Infinity : msb / msw;
   const p = msw === 0 ? 0 : 1 - jStat.centralF.cdf(F, dfb, dfw);
 
@@ -212,8 +244,9 @@ export function anovaOneWay(
   const eta2 = sst === 0 ? 0 : ssb / sst;
 
   // 粗略近似：方便先有 CI
-  const varEta2Approx = (2 * (eta2 ** 2) * (dfw ** 2 + (k - 1) ** 2)) / ((N ** 2) * (k - 1) ** 2);
-  const z = zScore(0.5 + (ciLevel / 2));
+  const varEta2Approx =
+    (2 * eta2 ** 2 * (dfw ** 2 + (k - 1) ** 2)) / (N ** 2 * (k - 1) ** 2);
+  const z = zScore(0.5 + ciLevel / 2);
   const ciEta2: CI = {
     level: ciLevel,
     lower: clamp01(eta2 - z * Math.sqrt(Math.max(varEta2Approx, 0))),
@@ -225,9 +258,10 @@ export function anovaOneWay(
     p,
     ci: { eta2: ciEta2 },
     effectSize: { eta2 },
-    dfb, dfw,
+    dfb,
+    dfw,
     groupMeans: Object.fromEntries(labels.map((l, i) => [l, groupMeans[i]])),
-    sizes: Object.fromEntries(labels.map((l, i) => [l, groups[i]!.length]))
+    sizes: Object.fromEntries(labels.map((l, i) => [l, groups[i]!.length])),
   };
 }
 
@@ -243,10 +277,14 @@ export function correlation(
   const ciLevel = args.ciLevel ?? 0.95;
 
   // 檢查
-  const x = rows.map(r => toNum(r[xKey]));
-  const y = rows.map(r => toNum(r[yKey]));
+  const x = rows.map((r) => toNum(r[xKey]));
+  const y = rows.map((r) => toNum(r[yKey]));
   if (x.length !== y.length || x.length < 3)
-    throw { status: 400, code: "BAD_LENGTH", message: "樣本量需 ≥3 且 x,y 等長" };
+    throw {
+      status: 400,
+      code: "BAD_LENGTH",
+      message: "樣本量需 ≥3 且 x,y 等長",
+    };
 
   // r、t、p
   const r = ss.sampleCorrelation(x, y);
@@ -268,7 +306,7 @@ export function correlation(
     t,
     p,
     ci: { level: ciLevel, lower: rl, upper: ru },
-    df: n - 2
+    df: n - 2,
   };
 }
 
@@ -288,27 +326,40 @@ export function leveneTest(
   // 分組 & 檢查
   const g = groupBy(rows, groupKey);
   const labels = Object.keys(g);
-  if (labels.length < 2) throw { status: 400, code: "NEED_2_GROUPS", message: "Levene 需要至少兩組" };
+  if (labels.length < 2)
+    throw {
+      status: 400,
+      code: "NEED_2_GROUPS",
+      message: "Levene 需要至少兩組",
+    };
 
   // 取組別數值
-  const groups = labels.map(l => g[l]!.map(r => toNum(r[valueKey])));
+  const groups = labels.map((l) => g[l]!.map((r) => toNum(r[valueKey])));
   const k = groups.length;
-  const Ns = groups.map(grp => grp.length);
+  const Ns = groups.map((grp) => grp.length);
   const N = Ns.reduce((a, b) => a + b, 0);
 
   // 以 median/mean 為中心，轉成 Z 值（絕對偏差）
-  const Ti = groups.map(grp => (center === "median" ? ss.median(grp) : ss.mean(grp)));
-  const Zij = groups.map((grp, i) => grp.map(v => Math.abs(v - Ti[i]!)));
+  const Ti = groups.map((grp) =>
+    center === "median" ? ss.median(grp) : ss.mean(grp)
+  );
+  const Zij = groups.map((grp, i) => grp.map((v) => Math.abs(v - Ti[i]!)));
 
   // 對 Z 做一因子 ANOVA：F = MS_between / MS_within
   const allZ = Zij.flat();
   const grandZ = ss.mean(allZ);
-  const ssb = Zij.reduce((acc, zgrp) => acc + zgrp.length * (ss.mean(zgrp) - grandZ) ** 2, 0);
-  const ssw = Zij.reduce((acc, zgrp) =>
-    acc + zgrp.reduce((a, v) => a + (v - ss.mean(zgrp)) ** 2, 0), 0);
+  const ssb = Zij.reduce(
+    (acc, zgrp) => acc + zgrp.length * (ss.mean(zgrp) - grandZ) ** 2,
+    0
+  );
+  const ssw = Zij.reduce(
+    (acc, zgrp) => acc + zgrp.reduce((a, v) => a + (v - ss.mean(zgrp)) ** 2, 0),
+    0
+  );
   const dfb = k - 1;
   const dfw = N - k;
-  const msb = ssb / dfb, msw = ssw / dfw;
+  const msb = ssb / dfb,
+    msw = ssw / dfw;
   const F = msw === 0 ? Infinity : msb / msw;
   const p = msw === 0 ? 0 : 1 - jStat.centralF.cdf(F, dfb, dfw);
 
@@ -319,9 +370,12 @@ export function leveneTest(
 
 /** Cohen's d（獨立樣本）：以 pooled SD 標準化平均差。 */
 function cohensD_independent(a: number[], b: number[]) {
-  const ma = ss.mean(a), mb = ss.mean(b);
-  const sva = ss.sampleVariance(a), svb = ss.sampleVariance(b);
-  const na = a.length, nb = b.length;
+  const ma = ss.mean(a),
+    mb = ss.mean(b);
+  const sva = ss.sampleVariance(a),
+    svb = ss.sampleVariance(b);
+  const na = a.length,
+    nb = b.length;
   const sp2 = ((na - 1) * sva + (nb - 1) * svb) / (na + nb - 2);
   const sp = Math.sqrt(sp2);
   return sp === 0 ? 0 : (ma - mb) / sp;
@@ -329,7 +383,13 @@ function cohensD_independent(a: number[], b: number[]) {
 
 /** (μA-μB) 的信賴區間（獨立樣本, pooled-variance）。 */
 function ciForMeanDiff_independent(params: {
-  ma: number; mb: number; sp2: number; na: number; nb: number; df: number; level: number;
+  ma: number;
+  mb: number;
+  sp2: number;
+  na: number;
+  nb: number;
+  df: number;
+  level: number;
 }): CI {
   const { ma, mb, sp2, na, nb, df, level } = params;
   const se = Math.sqrt(sp2 * (1 / na + 1 / nb));
@@ -339,7 +399,13 @@ function ciForMeanDiff_independent(params: {
 }
 
 /** 差值平均 (μd) 的信賴區間（成對樣本）。 */
-function ciForMeanDiff_paired(params: { md: number; sd: number; n: number; df: number; level: number }): CI {
+function ciForMeanDiff_paired(params: {
+  md: number;
+  sd: number;
+  n: number;
+  df: number;
+  level: number;
+}): CI {
   const { md, sd, n, df, level } = params;
   const se = sd / Math.sqrt(n);
   const tcrit = jStat.studentt.inv(0.5 + level / 2, df);

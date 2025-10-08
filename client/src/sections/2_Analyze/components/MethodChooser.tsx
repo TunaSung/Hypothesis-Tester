@@ -4,7 +4,8 @@ type MethodChooserProps = {
   selectedMethod: SuggestResp["method"] | "";
   setSelectedMethod: (m: SuggestResp["method"] | "") => void;
   suggestedTest: SuggestResp | null;
-}
+};
+
 export function MethodChooser({
   selectedMethod,
   setSelectedMethod,

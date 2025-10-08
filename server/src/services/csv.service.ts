@@ -8,16 +8,18 @@ import { createReadStream } from "fs";
  */
 
 export async function readCSV(path: string): Promise<Record<string, string>[]> {
-  return new Promise((resolve, reject) => {  // 供後續 await
+  return new Promise((resolve, reject) => {
+    // 供後續 await
     const rows: Record<string, string>[] = [];
 
     // 建立檔案讀取串流，傳給 csv-parse 解析器
     createReadStream(path)
-      .pipe(  // 把檔案串流導到 csv-parse 解析器裡
+      .pipe(
+        // 把檔案串流導到 csv-parse 解析器裡
         parse({
-          columns: true,  // 解析時自動用第一列當欄位名稱
-          trim: true,  // 去掉欄位值的前後空白
-          skip_empty_lines: true
+          columns: true, // 解析時自動用第一列當欄位名稱
+          trim: true, // 去掉欄位值的前後空白
+          skip_empty_lines: true,
         })
       )
       // 每讀到一列資料，就 push 到 rows 陣列

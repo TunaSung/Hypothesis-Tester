@@ -1,18 +1,18 @@
-import { memo, useState } from "react"
-import Result from "../../7_Result/Result"
-import { formatDate, formatValue } from "../../7_Result/libs/format"
+import { memo, useState } from "react";
+import Result from "../../7_Result/Result";
+import { formatDate, formatValue } from "../../7_Result/libs/format";
 
-type KnownMethod = "correlation" | "anova" | "independent_t" | "paired_t"
+type KnownMethod = "correlation" | "anova" | "independent_t" | "paired_t";
 
 type HistoryCardProps = {
-  fileName: string
-  method: KnownMethod | string
-  input: Record<string, unknown>
-  result: Record<string, unknown>
-  aiSummary: string
-  date: string
-  maxFields?: number
-}
+  fileName: string;
+  method: KnownMethod | string;
+  input: Record<string, unknown>;
+  result: Record<string, unknown>;
+  aiSummary: string;
+  date: string;
+  maxFields?: number;
+};
 
 const methodStyleMap: Record<string, string> = {
   anova: "bg-purple-50 text-purple-700 ring-1 ring-purple-200",
@@ -20,7 +20,7 @@ const methodStyleMap: Record<string, string> = {
   independent_t: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
   paired_t: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
   default: "bg-slate-50 text-slate-700 ring-1 ring-slate-200",
-}
+};
 
 function HistoryCard({
   fileName,
@@ -29,19 +29,20 @@ function HistoryCard({
   result,
   aiSummary,
   date,
-  maxFields = 3
+  maxFields = 3,
 }: HistoryCardProps) {
-  const keys = Object.keys(input)
-  const shownKeys = keys.slice(0, maxFields)
-  const hiddenCount = Math.max(0, keys.length - shownKeys.length)
-  const [isOpen, setIsOpen] = useState(false)
+  const keys = Object.keys(input);
+  const shownKeys = keys.slice(0, maxFields);
+  const hiddenCount = Math.max(0, keys.length - shownKeys.length);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const badgeClass = methodStyleMap[method as KnownMethod] ?? methodStyleMap.default
-  const formatMethod = String(method).replaceAll("_", " ")
+  const badgeClass =
+    methodStyleMap[method as KnownMethod] ?? methodStyleMap.default;
+  const formatMethod = String(method).replaceAll("_", " ");
 
   const isClose = () => {
-    setIsOpen(false)
-  }
+    setIsOpen(false);
+  };
   return (
     <article
       className="w-full max-w-xl border border-slate-200 shadow-sm rounded-2xl p-4 bg-white hover:shadow-md transition-shadow"
@@ -50,14 +51,18 @@ function HistoryCard({
       {/* Header */}
       <header className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-base font-semibold text-slate-800 truncate" title={fileName}>
+          <h3
+            className="text-base font-semibold text-slate-800 truncate"
+            title={fileName}
+          >
             📄 {fileName}
           </h3>
           <time className="text-sm text-slate-500">{formatDate(date)}</time>
         </div>
         <span
           className={
-            "px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap " + badgeClass
+            "px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap " +
+            badgeClass
           }
           title={String(method)}
           aria-label={`method: ${method}`}
@@ -71,12 +76,17 @@ function HistoryCard({
         {shownKeys.map((k) => (
           <div key={k} className="min-w-0">
             <dt className="text-xs text-slate-500">{k}</dt>
-            <dd className="text-sm text-slate-800 break-words" title={formatValue((input as any)[k])}>
+            <dd
+              className="text-sm text-slate-800 break-words"
+              title={formatValue((input as any)[k])}
+            >
               {formatValue((input as any)[k])}
             </dd>
           </div>
         ))}
-        {hiddenCount > 0 && <div className="text-sm text-slate-500">+{hiddenCount} more…</div>}
+        {hiddenCount > 0 && (
+          <div className="text-sm text-slate-500">+{hiddenCount} more…</div>
+        )}
       </dl>
 
       {/* Actions */}
@@ -113,8 +123,7 @@ function HistoryCard({
         </div>
       )}
     </article>
-  )
+  );
 }
 
-export default memo(HistoryCard)
-
+export default memo(HistoryCard);

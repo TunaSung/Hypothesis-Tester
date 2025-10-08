@@ -4,7 +4,7 @@ type StatCardProps = {
   title: string;
   value: string;
   sub?: string;
-}
+};
 
 function StatCard({ title, value, sub }: StatCardProps) {
   return (
@@ -13,7 +13,7 @@ function StatCard({ title, value, sub }: StatCardProps) {
       <p className="text-2xl font-bold">{value}</p>
       {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
     </div>
-  )
+  );
 }
 
 export default memo(StatCard);

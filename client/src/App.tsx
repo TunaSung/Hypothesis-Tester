@@ -1,11 +1,7 @@
 import "./App.css";
 import { lazy } from "react";
 import Navbar from "./components/Layout/Navbar";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 const Landing = lazy(() => import("./sections/1_Landing/Landing"));
 const Analyze = lazy(() => import("./sections/2_Analyze/Analyze"));
@@ -15,7 +11,6 @@ const About = lazy(() => import("./sections/5_About/About"));
 const Sign = lazy(() => import("./sections/6_Sign/Sign"));
 
 function App() {
-
   return (
     <Router>
       <Navbar />

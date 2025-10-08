@@ -1,20 +1,20 @@
 export type SignUpResp = {
-    message: string
-    user: Record<string, unknown>
-}
+  message: string;
+  user: Record<string, unknown>;
+};
 
 export type SignInResp = {
-    message: string
-    token: string
-    refreshToken: string
-    user?: Record<string, unknown>
-}
+  message: string;
+  token: string;
+  refreshToken: string;
+  user?: Record<string, unknown>;
+};
 
 export type RefreshTokenResp = {
-    token: string
-}
+  token: string;
+};
 
 export type ForgetPasswordResp = {
-    message: string
-    refreshToken: string
-}
+  message: string;
+  refreshToken: string;
+};

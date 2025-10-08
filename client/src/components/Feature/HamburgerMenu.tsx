@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, useCallback } from "react"
-import type { NavItem } from "../../types/NavType"
-import { NavLink } from "react-router-dom"
-import { motion, AnimatePresence } from "framer-motion"
-import { SlMenu } from "react-icons/sl"
+import { useEffect, useRef, useState, useCallback } from "react";
+import type { NavItem } from "../../types/NavType";
+import { NavLink } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { SlMenu } from "react-icons/sl";
 
 interface HamburgerMenuProps {
-  sectionList: NavItem[]
+  sectionList: NavItem[];
 }
 
 function useOutsideClick<T extends HTMLElement | null>(
@@ -14,67 +14,67 @@ function useOutsideClick<T extends HTMLElement | null>(
 ) {
   useEffect(() => {
     const listener = (event: MouseEvent) => {
-      const el = ref.current
+      const el = ref.current;
       if (
         el &&
         el instanceof HTMLElement &&
         !el.contains(event.target as Node)
       ) {
-        handler(event)
+        handler(event);
       }
-    }
-    document.addEventListener("mousedown", listener)
+    };
+    document.addEventListener("mousedown", listener);
     return () => {
-      document.removeEventListener("mousedown", listener)
-    }
-  }, [ref, handler])
+      document.removeEventListener("mousedown", listener);
+    };
+  }, [ref, handler]);
 }
 
 function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null)
-  const firstLinkRef = useRef<HTMLAnchorElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen])
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
-      const t = setTimeout(() => firstLinkRef.current?.focus(), 0)
-      return () => clearTimeout(t)
+      const t = setTimeout(() => firstLinkRef.current?.focus(), 0);
+      return () => clearTimeout(t);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const handleMenuOpen = () => {
-    setIsOpen((prev) => !prev)
-  }
+    setIsOpen((prev) => !prev);
+  };
 
   const handleOutsideClick = useCallback(() => {
     if (isOpen) {
-      handleMenuOpen()
+      handleMenuOpen();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
-  useOutsideClick(containerRef, handleOutsideClick)
+  useOutsideClick(containerRef, handleOutsideClick);
 
   const handleItemClick = useCallback(
     (func: () => void) => () => {
       try {
-        func()
+        func();
       } finally {
-        setIsOpen(false)
+        setIsOpen(false);
       }
     },
     []
-  )
+  );
 
   return (
     <div ref={containerRef} className="flex justify-center items-center">
@@ -130,7 +130,7 @@ function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
       </AnimatePresence>
       {/* End menu list */}
     </div>
-  )
+  );
 }
 
-export default HamburgerMenu
+export default HamburgerMenu;

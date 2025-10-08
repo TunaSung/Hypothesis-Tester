@@ -5,7 +5,7 @@ type AnalysisSettingsProps = {
 
 export function AnalysisSettings({
   significanceLevel,
-  setSignificanceLevel
+  setSignificanceLevel,
 }: AnalysisSettingsProps) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">

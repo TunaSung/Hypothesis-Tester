@@ -5,9 +5,9 @@ import { readCSV, getColumns } from "../services/csv.service.js";
 
 export const uploadDataset: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.id
-    if(!userId) {
-      return res.status(404).json({ message: "未登入" })
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(404).json({ message: "未登入" });
     }
 
     if (!req.file) throw { status: 400, message: "缺少 CSV 檔案" };
@@ -19,12 +19,12 @@ export const uploadDataset: RequestHandler = async (req, res, next) => {
       path: file.path,
       columns: JSON.stringify(columns),
       nRows: rows.length,
-      userId
+      userId,
     });
     res.json({ id: ds.id, filename: ds.filename, columns, nRows: ds.nRows });
   } catch (e) {
     const file = (req as any).file as Express.Multer.File | undefined;
-    if (file) await unlink(file.path).catch(() => { });
+    if (file) await unlink(file.path).catch(() => {});
     next(e);
   }
 };
@@ -38,9 +38,9 @@ export const getDatasetMeta: RequestHandler = async (req, res, next) => {
       id: ds.id,
       filename: ds.filename,
       columns: JSON.parse(ds.columns),
-      nRows: ds.nRows
+      nRows: ds.nRows,
     });
   } catch (e) {
-    next(e)
+    next(e);
   }
 };

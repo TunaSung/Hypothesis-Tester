@@ -1,99 +1,99 @@
-import { useMemo, useRef, useState } from "react"
-import { AnalysisSettings } from "./components/AnalysisSettings"
-import { ErrorAlert } from "./components/ErrorAlert"
-import { MethodChooser } from "./components/MethodChooser"
-import { QuestionBox } from "./components/QuestionBox"
-import { UploadCard } from "./components/UploadCard"
-import { VariableSelector } from "./components/VariableSelector"
-import Result from "../7_Result/Result"
+import { useMemo, useRef, useState } from "react";
+import { AnalysisSettings } from "./components/AnalysisSettings";
+import { ErrorAlert } from "./components/ErrorAlert";
+import { MethodChooser } from "./components/MethodChooser";
+import { QuestionBox } from "./components/QuestionBox";
+import { UploadCard } from "./components/UploadCard";
+import { VariableSelector } from "./components/VariableSelector";
+import Result from "../7_Result/Result";
 
-import { uploadCSV, aiSuggest, runTest } from "../../service/analyze.service"
-import type { Method, RunResp, SuggestResp } from "../../types/Analyze"
+import { uploadCSV, aiSuggest, runTest } from "../../service/analyze.service";
+import type { Method, RunResp, SuggestResp } from "../../types/Analyze";
 
 function Analyze() {
   // Refs
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Dataset / Columns
-  const [datasetId, setDatasetId] = useState<number | null>(null)
-  const [datasetName, setDatasetName] = useState<string>("")
-  const [columns, setColumns] = useState<string[]>([])
-  const [isUploading, setIsUploading] = useState(false)
+  const [datasetId, setDatasetId] = useState<number | null>(null);
+  const [datasetName, setDatasetName] = useState<string>("");
+  const [columns, setColumns] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Question / Suggest
-  const [question, setQuestion] = useState("")
-  const [suggestedTest, setSuggestedTest] = useState<SuggestResp | null>(null)
-  const [selectedMethod, setSelectedMethod] = useState<Method | "">("")
+  const [question, setQuestion] = useState("");
+  const [suggestedTest, setSuggestedTest] = useState<SuggestResp | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<Method | "">("");
 
   // Per-method keys
-  const [groupKey, setGroupKey] = useState("")
-  const [valueKey, setValueKey] = useState("")
-  const [preKey, setPreKey] = useState("")
-  const [postKey, setPostKey] = useState("")
-  const [xKey, setXKey] = useState("")
-  const [yKey, setYKey] = useState("")
+  const [groupKey, setGroupKey] = useState("");
+  const [valueKey, setValueKey] = useState("");
+  const [preKey, setPreKey] = useState("");
+  const [postKey, setPostKey] = useState("");
+  const [xKey, setXKey] = useState("");
+  const [yKey, setYKey] = useState("");
 
   // Settings
-  const [significanceLevel, setSignificanceLevel] = useState(0.05)
+  const [significanceLevel, setSignificanceLevel] = useState(0.05);
 
   // Run / Result / Error
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [result, setResult] = useState<RunResp | null>(null)
-  const [errorMsg, setErrorMsg] = useState("")
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [result, setResult] = useState<RunResp | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   // Handlers
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
     e
   ) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setIsUploading(true)
-    setErrorMsg("")
-    setResult(null)
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    setErrorMsg("");
+    setResult(null);
 
     try {
-      const fd = new FormData()
-      fd.append("file", file)
-      const data = await uploadCSV(fd)
-      setDatasetId(data.id)
-      setDatasetName(data.filename)
-      setColumns(data.columns ?? [])
-      setGroupKey("")
-      setValueKey("")
-      setPreKey("")
-      setPostKey("")
-      setXKey("")
-      setYKey("")
-      setSuggestedTest(null)
-      setSelectedMethod("")
+      const fd = new FormData();
+      fd.append("file", file);
+      const data = await uploadCSV(fd);
+      setDatasetId(data.id);
+      setDatasetName(data.filename);
+      setColumns(data.columns ?? []);
+      setGroupKey("");
+      setValueKey("");
+      setPreKey("");
+      setPostKey("");
+      setXKey("");
+      setYKey("");
+      setSuggestedTest(null);
+      setSelectedMethod("");
     } catch (err: any) {
-      setErrorMsg(err?.message ?? "Upload failed")
+      setErrorMsg(err?.message ?? "Upload failed");
     } finally {
-      setIsUploading(false)
-      if (fileInputRef.current) fileInputRef.current.value = ""
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
-  }
+  };
 
   const handleSuggest = async () => {
-    if (!datasetId || !question.trim()) return
-    setErrorMsg("")
-    setSuggestedTest(null)
+    if (!datasetId || !question.trim()) return;
+    setErrorMsg("");
+    setSuggestedTest(null);
     try {
-      const data = await aiSuggest(datasetId, question)
-      setSuggestedTest(data)
-      setSelectedMethod(data.method)
+      const data = await aiSuggest(datasetId, question);
+      setSuggestedTest(data);
+      setSelectedMethod(data.method);
     } catch (err: any) {
-      setErrorMsg(err?.message ?? "Suggest failed")
+      setErrorMsg(err?.message ?? "Suggest failed");
     }
-  }
+  };
 
   const readyToRun = useMemo(() => {
-    if (!datasetId || !selectedMethod) return false
-    if (selectedMethod === "independent_t") return !!groupKey && !!valueKey
-    if (selectedMethod === "paired_t") return !!preKey && !!postKey
-    if (selectedMethod === "anova") return !!groupKey && !!valueKey
-    if (selectedMethod === "correlation") return !!xKey && !!yKey
-    return false
+    if (!datasetId || !selectedMethod) return false;
+    if (selectedMethod === "independent_t") return !!groupKey && !!valueKey;
+    if (selectedMethod === "paired_t") return !!preKey && !!postKey;
+    if (selectedMethod === "anova") return !!groupKey && !!valueKey;
+    if (selectedMethod === "correlation") return !!xKey && !!yKey;
+    return false;
   }, [
     datasetId,
     selectedMethod,
@@ -103,41 +103,41 @@ function Analyze() {
     postKey,
     xKey,
     yKey,
-  ])
+  ]);
 
   const handleRunAnalysis = async () => {
-    if (!readyToRun || !selectedMethod || !datasetId) return
-    setIsAnalyzing(true)
-    setErrorMsg("")
-    setResult(null)
+    if (!readyToRun || !selectedMethod || !datasetId) return;
+    setIsAnalyzing(true);
+    setErrorMsg("");
+    setResult(null);
     try {
-      const args: Record<string, any> = { ciLevel: 1 - significanceLevel }
+      const args: Record<string, any> = { ciLevel: 1 - significanceLevel };
       switch (selectedMethod) {
         case "independent_t":
-          args.groupKey = groupKey
-          args.valueKey = valueKey
-          break
+          args.groupKey = groupKey;
+          args.valueKey = valueKey;
+          break;
         case "paired_t":
-          args.preKey = preKey
-          args.postKey = postKey
-          break
+          args.preKey = preKey;
+          args.postKey = postKey;
+          break;
         case "anova":
-          args.groupKey = groupKey
-          args.valueKey = valueKey
-          break
+          args.groupKey = groupKey;
+          args.valueKey = valueKey;
+          break;
         case "correlation":
-          args.xKey = xKey
-          args.yKey = yKey
-          break
+          args.xKey = xKey;
+          args.yKey = yKey;
+          break;
       }
-      const data = await runTest(datasetId, selectedMethod, args)
-      setResult(data)
+      const data = await runTest(datasetId, selectedMethod, args);
+      setResult(data);
     } catch (err: any) {
-      setErrorMsg(err?.message ?? "Run failed")
+      setErrorMsg(err?.message ?? "Run failed");
     } finally {
-      setIsAnalyzing(false)
+      setIsAnalyzing(false);
     }
-  }
+  };
 
   return (
     <div className="bg-sky-100/40">
@@ -242,7 +242,7 @@ function Analyze() {
         </main>
       </div>
     </div>
-  )
+  );
 }
 
-export default Analyze
+export default Analyze;
