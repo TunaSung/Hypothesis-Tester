@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { validate } from "../middlewares/validate.js";
 import authenticate from "../middlewares/JWT.js"
-import { suggestSchema, runAnalysisSchema } from "../schemas/analysis.shema.js";
+import { suggestSchema, runAnalysisSchema } from "../schemas/analysis.schema.js";
 import { suggest, runAnalysis, getHistory } from "../handlers/analysis.handler.js";
 
 const router = Router();
