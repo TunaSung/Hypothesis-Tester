@@ -1,65 +1,97 @@
-import type { RequestHandler } from "express";
-import { Dataset, Analysis } from "../models/Association.js";
-import { readCSV } from "../services/csv.service.js";
-import { suggestMethod, explainResult } from "../services/ai.service.js";
-import { independentT, pairedT, anovaOneWay, correlation } from "../services/stat.service.js";
-import type { RunAnalysisBody } from "../schemas/analysis.shema.js";
+import type { RequestHandler } from "express"
+import { Dataset, Analysis } from "../models/Association.js"
+import { readCSV } from "../services/csv.service.js"
+import { suggestMethod, explainResult } from "../services/ai.service.js"
+import { independentT, pairedT, anovaOneWay, correlation } from "../services/stat.service.js"
+import type { RunAnalysisBody } from "../schemas/analysis.shema.js"
 
 export const suggest: RequestHandler = async (req, res, next) => {
-    try {
-      const { datasetId, question } = req.body;
-      const ds = await Dataset.findByPk(datasetId);
-      if (!ds) throw { status: 404, message: "Dataset not found" };
-      const columns = JSON.parse(ds.columns);
-      const suggestion = await suggestMethod({ columns, question });
-      res.json(suggestion);
-    } catch (e) { 
-      next(e) 
-    }
-  };
+  try {
+    const { datasetId, question } = req.body
+    const ds = await Dataset.findByPk(datasetId)
+    if (!ds) throw { status: 404, message: "Dataset not found" }
+    const columns = JSON.parse(ds.columns)
+    const suggestion = await suggestMethod({ columns, question })
+    res.json(suggestion)
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const runAnalysis: RequestHandler = async (req, res, next) => {
-    try {
-      const userId = req.user?.id
-      if(!userId) {
-        return res.status(404).json({ message: "未登入" })
-      }
-      const { datasetId, method, args } = req.body as RunAnalysisBody
+  try {
+    const userId = req.user?.id
+    if (!userId) throw { status: 404, message: "user not found" }
+    const { datasetId, method, args } = req.body as RunAnalysisBody
 
-      const ds = await Dataset.findByPk(datasetId);
-      if (!ds) throw { status: 404, message: "Dataset not found" };
+    const ds = await Dataset.findByPk(datasetId)
+    if (!ds) throw { status: 404, message: "Dataset not found" }
 
-      const rows = await readCSV(ds.path);
-      let result: any;
-      switch (method) {
-        case "independent_t":
-          result = independentT(rows, { groupKey: args.groupKey, valueKey: args.valueKey });
-          break;
-        case "paired_t":
-          result = pairedT(rows, { subjectKey: args.subjectKey, preKey: args.preKey, postKey: args.postKey });
-          break;
-        case "anova":
-          result = anovaOneWay(rows, { groupKey: args.groupKey, valueKey: args.valueKey });
-          break;
-        case "correlation":
-          result = correlation(rows, { xKey: args.xKey, yKey: args.yKey });
-          break;
-        default:
-          throw { status: 400, message: `Unsupported method: ${method}` };
-      }
-
-      const aiSummary = await explainResult({ method, args }, result);
-      const rec = await Analysis.create({
-        datasetId,
-        method,
-        input: JSON.stringify(args),
-        result: JSON.stringify(result),
-        aiSummary,
-        userId
-      });
-
-      res.json({ id: rec.id, method, args, result, aiSummary });
-    } catch (e) {
-      next(e)
+    const rows = await readCSV(ds.path)
+    let result: any
+    switch (method) {
+      case "independent_t":
+        result = independentT(rows, { groupKey: args.groupKey, valueKey: args.valueKey })
+        break
+      case "paired_t":
+        result = pairedT(rows, { preKey: args.preKey, postKey: args.postKey })
+        break
+      case "anova":
+        result = anovaOneWay(rows, { groupKey: args.groupKey, valueKey: args.valueKey })
+        break
+      case "correlation":
+        result = correlation(rows, { xKey: args.xKey, yKey: args.yKey })
+        break
+      default:
+        throw { status: 400, message: `Unsupported method: ${method}` }
     }
-  };
+
+    const aiSummary = await explainResult({ method, args }, result)
+    const rec = await Analysis.create({
+      datasetId,
+      method,
+      input: JSON.stringify(args),
+      result: JSON.stringify(result),
+      aiSummary,
+      userId
+    })
+
+    const analysisResult = {
+      id: rec.id,
+      method,
+      input: rec.input,
+      result,
+      aiSummary
+    }
+
+    res.status(200).json({ message: "Fetch history success", result: analysisResult })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getHistory: RequestHandler = async (req, res) => {
+  try {
+    const userId = req.user?.id
+
+    const history = await Analysis.findAll({
+      where: {
+        userId: userId
+      },
+      attributes: ["method", "input", "result", "aiSummary", "createdAt"],
+      include: {
+        model: Dataset,
+        where: {
+          userId: userId
+        },
+        attributes: ["filename"],
+        required: true
+      },
+      order: [["createdAt", "DESC"]]
+    })
+
+    res.status(200).json({ message: "Fetch history success", history: history })
+  } catch (error) {
+    return res.status(401).json({ error: "Fetch history failed" })
+  }
+}

@@ -25,7 +25,6 @@ const independentArgs = z.object({
 }).strict();
 
 const pairedArgs = z.object({
-  subjectKey: z.string(),
   preKey: z.string(),
   postKey: z.string(),
   ...ci,
