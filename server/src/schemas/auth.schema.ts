@@ -33,11 +33,11 @@ export const refreshTokenSchema = z.object({
 });
 export type RefreshTokenBody = z.infer<typeof refreshTokenSchema>["body"];
 
-export const forgotPasswordSchema = z.object({
-  body: z.object({
-    email: z.string().email(),
-  }).strict(),
-  query: z.object({}).strict(),
-  params: z.object({}).strict(),
-});
-export type ForgotPasswordBody = z.infer<typeof forgotPasswordSchema>["body"];
+// export const forgotPasswordSchema = z.object({
+//   body: z.object({
+//     email: z.string().email(),
+//   }).strict(),
+//   query: z.object({}).strict(),
+//   params: z.object({}).strict(),
+// });
+// export type ForgotPasswordBody = z.infer<typeof forgotPasswordSchema>["body"];

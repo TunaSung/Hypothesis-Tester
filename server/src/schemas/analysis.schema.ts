@@ -14,7 +14,7 @@ export const suggestSchema = z.object({
 
   params: z.object({}).strict()
 });
-
+export type SuggestBody = z.infer<typeof suggestSchema>["body"]
 // analysis
 const ci = { ciLevel: z.number().min(0.8).max(0.999).optional() };
 
