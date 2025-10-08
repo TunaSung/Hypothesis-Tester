@@ -35,6 +35,8 @@ function Navbar() {
     <nav className="sticky top-0 w-full py-0 sm:py-3 bg-white/80 backdrop-blur-sm border-b border-slate-200 z-50">
       <div className="container-mid sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+
+          {/* Start home page btn */}
           <Link
             to="/"
             aria-label="Go to landing page"
@@ -47,7 +49,9 @@ function Navbar() {
               Hypothesis Tester
             </span>
           </Link>
+          {/* End home page btn */}
 
+          {/* Start nav item */}
           {!isWidth768 ?
             <HamburgerMenu sectionList={NAV_ITEMS}/>
             :
@@ -76,6 +80,8 @@ function Navbar() {
               ))}
             </ul>
           }
+          {/* End nav item */}
+          
         </div>
       </div>
     </nav>

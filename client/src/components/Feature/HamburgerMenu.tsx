@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import type { NavItem } from "../../types/NavType";
-import { NavLink } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { SlMenu } from "react-icons/sl";
+import { useEffect, useRef, useState, useCallback } from "react"
+import type { NavItem } from "../../types/NavType"
+import { NavLink } from "react-router-dom"
+import { motion, AnimatePresence } from "framer-motion"
+import { SlMenu } from "react-icons/sl"
 
 interface HamburgerMenuProps {
-  sectionList: NavItem[];
+  sectionList: NavItem[]
 }
 
 function useOutsideClick<T extends HTMLElement | null>(
@@ -14,73 +14,67 @@ function useOutsideClick<T extends HTMLElement | null>(
 ) {
   useEffect(() => {
     const listener = (event: MouseEvent) => {
-      const el = ref.current;
+      const el = ref.current
       if (
         el &&
         el instanceof HTMLElement &&
         !el.contains(event.target as Node)
       ) {
-        handler(event);
+        handler(event)
       }
-    };
-    document.addEventListener("mousedown", listener);
+    }
+    document.addEventListener("mousedown", listener)
     return () => {
-      document.removeEventListener("mousedown", listener);
-    };
-  }, [ref, handler]);
+      document.removeEventListener("mousedown", listener)
+    }
+  }, [ref, handler])
 }
 
 function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
-  // State: controls whether the menu is open
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
-  // Ref: tracks the component container for outside click detection
-  const containerRef = useRef<HTMLDivElement>(null);
-  const firstLinkRef = useRef<HTMLAnchorElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null)
+  const firstLinkRef = useRef<HTMLAnchorElement>(null)
 
-  // Close the menu when the Escape key is pressed
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen])
 
-  // focus first link when opened
   useEffect(() => {
     if (isOpen) {
-      // small timeout to wait for AnimatePresence mount
-      const t = setTimeout(() => firstLinkRef.current?.focus(), 0);
-      return () => clearTimeout(t);
+      const t = setTimeout(() => firstLinkRef.current?.focus(), 0)
+      return () => clearTimeout(t)
     }
-  }, [isOpen]);
+  }, [isOpen])
 
-  // Toggle the menu open/closed
   const handleMenuOpen = () => {
-    setIsOpen((prev) => !prev);
-  };
+    setIsOpen((prev) => !prev)
+  }
 
-  // Memoized callback to handle outside clicks (only closes when open)
   const handleOutsideClick = useCallback(() => {
-    if (isOpen) handleMenuOpen();
-  }, [isOpen]);
+    if (isOpen) {
+      handleMenuOpen()
+    }
+  }, [isOpen])
 
-  // Attach the outside click listener
-  useOutsideClick(containerRef, handleOutsideClick);
+  useOutsideClick(containerRef, handleOutsideClick)
 
   const handleItemClick = useCallback(
     (func: () => void) => () => {
       try {
-        func();
+        func()
       } finally {
-        setIsOpen(false);
+        setIsOpen(false)
       }
     },
     []
-  );
+  )
 
   return (
     <div ref={containerRef} className="flex justify-center items-center">
@@ -136,7 +130,7 @@ function HamburgerMenu({ sectionList }: HamburgerMenuProps) {
       </AnimatePresence>
       {/* End menu list */}
     </div>
-  );
+  )
 }
 
-export default HamburgerMenu;
+export default HamburgerMenu

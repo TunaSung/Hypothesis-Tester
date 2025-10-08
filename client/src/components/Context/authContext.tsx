@@ -30,13 +30,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const data = await getHistory()
         setHistory(data.history)
-        console.table(
-          data.history.map(h => ({
-            method: h.method,
-            filename: h.dataset.filename,
-            createdAt: h.createdAt,
-          }))
-        );
       } catch (error) {
         console.log("load user data failed", error)
       }
