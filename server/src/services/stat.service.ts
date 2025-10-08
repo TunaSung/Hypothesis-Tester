@@ -82,49 +82,49 @@ export function independentT(
   rows: Rows,
   args: { groupKey: string; valueKey: string; ciLevel?: number }
 ) {
-  const { groupKey, valueKey } = args;
-  const ciLevel = args.ciLevel ?? 0.95;
+  const { groupKey, valueKey } = args
+  const ciLevel = args.ciLevel ?? 0.95
 
   // 分組
-  const g = groupBy(rows, groupKey);
-  const keys = Object.keys(g);
+  const g = groupBy(rows, groupKey)
+  const keys = Object.keys(g)
   if (keys.length !== 2)
-    throw { status: 400, code: "NEED_2_GROUPS", message: "independent_t 需要兩組" };
+    throw { status: 400, code: "NEED_2_GROUPS", message: "independent_t 需要兩組" }
 
-  const [A, B] = keys as [string, string];
-  if (!g[A] || !g[B]) throw { status: 400, code: "GROUP_UNDEFINED", message: "分組不存在" };
+  const [A, B] = keys as [string, string]
+  if (!g[A] || !g[B]) throw { status: 400, code: "GROUP_UNDEFINED", message: "分組不存在" }
 
   // 取出兩組數值並轉 number
-  const a = g[A].map(r => toNum(r[valueKey]));
-  const b = g[B].map(r => toNum(r[valueKey]));
-  const na = a.length, nb = b.length;
-  if (na < 2 || nb < 2) throw { status: 400, code: "SMALL_N", message: "每組至少 n≥2" };
+  const a = g[A].map(r => toNum(r[valueKey]))
+  const b = g[B].map(r => toNum(r[valueKey]))
+  const na = a.length, nb = b.length
+  if (na < 2 || nb < 2) throw { status: 400, code: "SMALL_N", message: "每組至少 n≥2" }
 
   // 基本統計量
-  const ma = ss.mean(a), mb = ss.mean(b);
-  const sva = ss.sampleVariance(a), svb = ss.sampleVariance(b); // t-test: 使用樣本變異數
-  const df = na + nb - 2;
+  const ma = ss.mean(a), mb = ss.mean(b)
+  const sva = ss.sampleVariance(a), svb = ss.sampleVariance(b)
+  const df = na + nb - 2
 
   // pooled 標準誤 & 檢定統計量
-  const sp2 = ((na - 1) * sva + (nb - 1) * svb) / df;
-  const se = Math.sqrt(sp2 * (1 / na + 1 / nb));
-  const t = se === 0 ? 0 : (ma - mb) / se;
-  const p = se === 0 ? 1 : 2 * (1 - jStat.studentt.cdf(Math.abs(t), df));
+  const sp2 = ((na - 1) * sva + (nb - 1) * svb) / df
+  const se = Math.sqrt(sp2 * (1 / na + 1 / nb))
+  const t = se === 0 ? 0 : (ma - mb) / se
+  const p = se === 0 ? 1 : 2 * (1 - jStat.studentt.cdf(Math.abs(t), df))
 
   // 假設檢定（等變異性） & 效應量 & 信賴區間
-  const levene = leveneTest(rows, { groupKey, valueKey });             // {F, df1, df2, p}
-  const d = cohensD_independent(a, b);                                 // Cohen's d
+  const levene = leveneTest(rows, { groupKey, valueKey })  // {F, df1, df2, p}
+  const d = cohensD_independent(a, b)  // Cohen's d
   const ci = ciForMeanDiff_independent({ ma, mb, sp2, na, nb, df, level: ciLevel });
 
   return {
-    statistic: t,
-    df,
+    t,
     p,
+    ci,
+    effectSize: { cohenD: d },
+    df,
     means: { [A]: ma, [B]: mb },
     sizes: { [A]: na, [B]: nb },
     assumptions: { levene },
-    effectSize: { cohenD: d },
-    ci
   };
 }
 
@@ -136,7 +136,7 @@ export function independentT(
  */
 export function pairedT(
   rows: Rows,
-  args: { subjectKey?: string; preKey: string; postKey: string; ciLevel?: number }
+  args: { preKey: string; postKey: string; ciLevel?: number }
 ) {
   const { preKey, postKey } = args;
   const ciLevel = args.ciLevel ?? 0.95;
@@ -158,7 +158,15 @@ export function pairedT(
   const dz = sd === 0 ? 0 : md / sd; // Cohen's dz
   const ci = ciForMeanDiff_paired({ md, sd, n, df, level: ciLevel });
 
-  return { statistic: t, df, p, meanDiff: md, n, effectSize: { cohenDz: dz }, ci };
+  return {
+    t,
+    p,
+    ci,
+    effectSize: { cohenDz: dz },
+    df,
+    meanDiff: md,
+    n
+  };
 }
 
 /**
@@ -202,7 +210,7 @@ export function anovaOneWay(
   // 效果量 η² (類似迴歸的 R²)
   const sst = ssb + ssw;
   const eta2 = sst === 0 ? 0 : ssb / sst;
-  
+
   // 粗略近似：方便先有 CI
   const varEta2Approx = (2 * (eta2 ** 2) * (dfw ** 2 + (k - 1) ** 2)) / ((N ** 2) * (k - 1) ** 2);
   const z = zScore(0.5 + (ciLevel / 2));
@@ -213,11 +221,13 @@ export function anovaOneWay(
   };
 
   return {
-    statistic: F, dfb, dfw, p,
-    groupMeans: Object.fromEntries(labels.map((l, i) => [l, groupMeans[i]])),
-    sizes: Object.fromEntries(labels.map((l, i) => [l, groups[i]!.length])),
+    F,
+    p,
+    ci: { eta2: ciEta2 },
     effectSize: { eta2 },
-    ci: { eta2: ciEta2 }
+    dfb, dfw,
+    groupMeans: Object.fromEntries(labels.map((l, i) => [l, groupMeans[i]])),
+    sizes: Object.fromEntries(labels.map((l, i) => [l, groups[i]!.length]))
   };
 }
 
@@ -253,7 +263,13 @@ export function correlation(
   const rl = (Math.exp(2 * zl) - 1) / (Math.exp(2 * zl) + 1);
   const ru = (Math.exp(2 * zu) - 1) / (Math.exp(2 * zu) + 1);
 
-  return { r, t, df: n - 2, p, ci: { level: ciLevel, lower: rl, upper: ru } };
+  return {
+    r,
+    t,
+    p,
+    ci: { level: ciLevel, lower: rl, upper: ru },
+    df: n - 2
+  };
 }
 
 /** ---------- Levene’s test (assumption) ---------- **/
