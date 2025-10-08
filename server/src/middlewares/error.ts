@@ -1,13 +1,11 @@
 import type { ErrorRequestHandler } from "express";
 
-// errorHandler: Express 的錯誤處理 middleware
-// 參數固定是 (err, req, res, next)
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-    // 1. 先決定 HTTP 狀態碼
-    //    如果錯誤物件有帶 status，就用它；否則預設 500 Internal Server Error
+    // 先決定 HTTP 狀態碼
+    // 如果錯誤物件有帶 status，就用它；否則預設 500 Internal Server Error
     const status = err.status ?? 500;
 
-    // 2. 準備回傳的 payload（錯誤訊息結構）
+    // 回傳的 payload
     const payload: {
         message: string;   // 錯誤訊息（給使用者看的）
         code: string;      // 錯誤代碼（方便前端辨識）
@@ -24,9 +22,9 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
         issues: err.issues,
     };
 
-    // 3. 在非 production 環境，把錯誤堆疊附加到 payload（方便 debug）
+    // 在非 production 環境，把錯誤堆疊附加到 payload（方便 debug）
     if (process.env.NODE_ENV !== "production") payload.stack = err.stack;
 
-    // 4. 設定 HTTP 狀態碼，並回傳 JSON 給前端
+    // 設定 HTTP 狀態碼，並回傳 JSON 給前端
     res.status(status).json(payload);
 };
