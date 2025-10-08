@@ -95,6 +95,10 @@ Content-Type: application/json
   "password": "20011107ryan"
 }
 
-### 登入
-GET http://localhost:8080/api/auth/history
+### 抓歷史資料
+GET http://localhost:8080/api/analysis/history
+Content-Type: application/json
+
+### 抓特定資料
+GET http://localhost:8080/api/analysis/1
 Content-Type: application/json
