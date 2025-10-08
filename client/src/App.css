@@ -30,10 +30,6 @@ Layout
     @apply w-[98%] md:w-[90%] lg:w-[80%] xl:w-[75%] 2xl:w-[65%] mx-auto px-4 sm:px-6 lg:px-8
 }
 
-.cart-container {
-    @apply px-8 flex items-center justify-center
-}
-
 .row {
     @apply mx-[-16px]
 }
