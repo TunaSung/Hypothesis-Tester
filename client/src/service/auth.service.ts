@@ -1,25 +1,26 @@
 import api from "./api"
 import { isAxiosError } from "axios"
+import type { SignInResp, SignUpResp } from "../types/Auth"
 
 // helper
 function getErrorMessage(error: unknown, fallback: string): string {
-    if(isAxiosError(error)) {
+    if (isAxiosError(error)) {
         return (
             (error.response?.data as any)?.message ??
             error.message ??
             fallback
         )
     }
-    if(error instanceof Error) return error.message
-    if(typeof error === "string") return error
-    return fallback 
+    if (error instanceof Error) return error.message
+    if (typeof error === "string") return error
+    return fallback
 }
 
 // token
 export const saveToken = (token: string, refreshToken?: string): void => {
     localStorage.setItem("token", token)
     localStorage.setItem("tokenSaveAt", Date.now().toString())
-    if(refreshToken) localStorage.setItem("refresh_token", refreshToken)
+    if (refreshToken) localStorage.setItem("refresh_token", refreshToken)
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`
 }
 
@@ -32,31 +33,9 @@ export const clearToken = (): void => {
 
 export const setAuthHeader = (): void => {
     const token = localStorage.getItem("token")
-    if(token) {
+    if (token) {
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`
     }
-}
-
-// type
-export type SignUpResponse = {
-    message: string
-    user: Record<string, unknown>
-}
-
-export type SignInResponse = {
-    message: string
-    token: string
-    refreshToken: string
-    user?: Record<string, unknown>
-}
-
-export type RefreshTokenRespnse = {
-    token: string
-}
-
-export type ForgetPasswordResponse = {
-    message: string
-    refreshToken: string
 }
 
 // service
@@ -64,9 +43,9 @@ export const signUp = async (
     username: string,
     email: string,
     password: string
-): Promise<SignUpResponse> => {
+): Promise<SignUpResp> => {
     try {
-        const res = await api.post<SignUpResponse>("/auth/signup", {
+        const res = await api.post<SignUpResp>("/auth/signup", {
             username: username.trim(),
             email: email.trim().toLowerCase(),
             password
@@ -80,16 +59,16 @@ export const signUp = async (
 export const signIn = async (
     email: string,
     password: string
-): Promise<SignInResponse> => {
+): Promise<SignInResp> => {
     try {
-        const res = await api.post<SignInResponse>("/auth/signin", {
+        const res = await api.post<SignInResp>("/auth/signin", {
             email: email.trim().toLowerCase(),
             password
         })
         const { token, refreshToken } = res.data;
-    saveToken(token, refreshToken);
-    return res.data;
-  } catch (error) {
-    throw new Error(getErrorMessage(error, "Sign in failed"));
+        saveToken(token, refreshToken);
+        return res.data;
+    } catch (error) {
+        throw new Error(getErrorMessage(error, "Sign in failed"));
     }
 }
