@@ -3,16 +3,16 @@ import { Dataset, Analysis } from "../models/Association.js"
 import { readCSV } from "../services/csv.service.js"
 import { suggestMethod, explainResult } from "../services/ai.service.js"
 import { independentT, pairedT, anovaOneWay, correlation } from "../services/stat.service.js"
-import type { RunAnalysisBody } from "../schemas/analysis.shema.js"
+import type { SuggestBody, RunAnalysisBody } from "../schemas/analysis.schema.js"
 
 export const suggest: RequestHandler = async (req, res, next) => {
   try {
-    const { datasetId, question } = req.body
+    const { datasetId, question } = req.body as SuggestBody
     const ds = await Dataset.findByPk(datasetId)
-    if (!ds) throw { status: 404, message: "Dataset not found" }
+    if (!ds) throw { status: 404, code: "DATASET_NOT_FOUND", message: "Dataset not found" }
     const columns = JSON.parse(ds.columns)
     const suggestion = await suggestMethod({ columns, question })
-    res.json(suggestion)
+    return res.status(200).json({ message: "Suggestion generated", suggestion })
   } catch (error) {
     next(error)
   }
@@ -21,11 +21,11 @@ export const suggest: RequestHandler = async (req, res, next) => {
 export const runAnalysis: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user?.id
-    if (!userId) throw { status: 404, message: "user not found" }
+    if (!userId) throw { status: 401, code: "UNAUTHORIZED", message: "請先登入" }
     const { datasetId, method, args } = req.body as RunAnalysisBody
 
     const ds = await Dataset.findByPk(datasetId)
-    if (!ds) throw { status: 404, message: "Dataset not found" }
+    if (!ds) throw { status: 404, code: "DATASET_NOT_FOUND", message: "Dataset not found" }
 
     const rows = await readCSV(ds.path)
     let result: any
@@ -70,7 +70,7 @@ export const runAnalysis: RequestHandler = async (req, res, next) => {
   }
 }
 
-export const getHistory: RequestHandler = async (req, res) => {
+export const getHistory: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user?.id
 
@@ -92,6 +92,6 @@ export const getHistory: RequestHandler = async (req, res) => {
 
     res.status(200).json({ message: "Fetch history success", history: history })
   } catch (error) {
-    return res.status(401).json({ error: "Fetch history failed" })
+    next(error)
   }
 }
