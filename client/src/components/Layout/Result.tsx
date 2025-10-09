@@ -1,6 +1,6 @@
 import { memo } from "react";
 import type { KnownMethod } from "../../types/Analyze";
-import StatCard from "./components/StatCard";
+import StatCard from "../../components/Feature/StatCard";
 import {
   get,
   asNum,
@@ -10,8 +10,8 @@ import {
   classifyP,
   formatDate,
   formatValue,
-} from "./libs/format";
-import { classifyEffect } from "./libs/classifyEffect";
+} from "../../utils/format";
+import { classifyEffect } from "../../utils/classifyEffect";
 
 type ResultProps = {
   fileName: string;

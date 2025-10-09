@@ -5,7 +5,7 @@ import { MethodChooser } from "./components/MethodChooser";
 import { QuestionBox } from "./components/QuestionBox";
 import { UploadCard } from "./components/UploadCard";
 import { VariableSelector } from "./components/VariableSelector";
-import Result from "../7_Result/Result";
+import Result from "../../components/Layout/Result";
 
 import { uploadCSV, aiSuggest, runTest } from "../../service/analyze.service";
 import type { Method, RunResp, SuggestResp } from "../../types/Analyze";

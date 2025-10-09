@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
-import Result from "../../7_Result/Result";
-import { formatDate, formatValue } from "../../7_Result/libs/format";
+import Result from "../../../components/Layout/Result";
+import { formatDate, formatValue } from "../../../utils/format";
 
 type KnownMethod = "correlation" | "anova" | "independent_t" | "paired_t";
 
