@@ -23,9 +23,10 @@ export const fmtCI = (lo?: number, hi?: number) =>
     ? `[${fmt3(lo)}, ${fmt3(hi)}]`
     : NULL_SYMBOL;
 
-export const fmtP = (p?: number) => {
+export const fmtP = (p?: number, alpha = 0.05) => {
   if (typeof p !== "number" || !Number.isFinite(p)) return NULL_SYMBOL;
-  return p < 0.001 ? "p < 0.001" : `p = ${p.toFixed(3)}`;
+  const fmAlpha = alpha.toFixed(2)
+  return p <= alpha ? `p ≦ ${fmAlpha}` : `p > ${fmAlpha}`;
 };
 
 export const classifyP = (p?: number, alpha = 0.05) =>

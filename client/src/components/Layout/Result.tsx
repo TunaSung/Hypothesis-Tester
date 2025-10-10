@@ -125,7 +125,7 @@ function Result({
         )}
 
         <StatCard title="Test Statistic" value={fmt3(statValue)} />
-        <StatCard title="P-value" value={fmtP(p)} sub={classifyP(p, alpha)} />
+        <StatCard title="P-value" value={fmtP(p, alpha)} sub={classifyP(p, alpha)} />
         <StatCard title="Confidence Interval" value={fmtCI(ciL, ciU)} />
 
         {method !== "correlation" && (
