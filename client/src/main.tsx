@@ -4,9 +4,9 @@ import App from "./App.tsx";
 import { AuthProvider } from "./components/Context/authContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <StrictMode>
+  <StrictMode>
+    <AuthProvider>
       <App />
-    </StrictMode>
-  </AuthProvider>
+    </AuthProvider>
+  </StrictMode>
 );
