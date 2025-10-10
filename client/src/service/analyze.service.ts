@@ -1,16 +1,17 @@
 import api from "./api";
-import { isAxiosError } from "axios";
-import type { Method, SuggestResp, RunResp, UploadResp, RunApiRes } from "../types/Analyze";
-import type { GetHistoryApiResp, GetHistoryApiRespRaw, HistoryItem } from "../types/Analyze";
-
-function getErrorMessage(error: unknown, fallback: string): string {
-  if (isAxiosError(error)) {
-    return (error.response?.data as any)?.message ?? error.message ?? fallback;
-  }
-  if (error instanceof Error) return error.message;
-  if (typeof error === "string") return error;
-  return fallback;
-}
+import type {
+  Method,
+  SuggestResp,
+  RunResp,
+  UploadResp,
+  RunApiRes,
+} from "../types/Analyze";
+import type {
+  GetHistoryApiResp,
+  GetHistoryApiRespRaw,
+  HistoryItem,
+} from "../types/Analyze";
+import { getErrorMessage } from "../utils/service";
 
 export async function uploadCSV(formData: FormData): Promise<UploadResp> {
   try {
@@ -25,7 +26,10 @@ export async function uploadCSV(formData: FormData): Promise<UploadResp> {
   }
 }
 
-export async function aiSuggest(datasetId: number, question: string): Promise<SuggestResp> {
+export async function aiSuggest(
+  datasetId: number,
+  question: string
+): Promise<SuggestResp> {
   try {
     const { data } = await api.post<SuggestResp>("/analysis/suggest", {
       datasetId,
@@ -39,11 +43,14 @@ export async function aiSuggest(datasetId: number, question: string): Promise<Su
   }
 }
 
-
 export function safeParse<T = Record<string, unknown>>(v: unknown): T {
   if (v && typeof v === "object") return v as T;
   if (typeof v === "string") {
-    try { return JSON.parse(v) as T; } catch { return {} as T; }
+    try {
+      return JSON.parse(v) as T;
+    } catch {
+      return {} as T;
+    }
   }
   return {} as T;
 }
@@ -53,7 +60,11 @@ export async function runTest(
   method: Method,
   args: Record<string, unknown>
 ): Promise<RunResp> {
-  const res = await api.post<RunApiRes>("/analysis/run", { datasetId, method, args });
+  const res = await api.post<RunApiRes>("/analysis/run", {
+    datasetId,
+    method,
+    args,
+  });
   const r = res.data.result;
   return {
     ...r,
@@ -64,7 +75,7 @@ export async function runTest(
 
 export async function getHistory(): Promise<GetHistoryApiResp> {
   const res = await api.get<GetHistoryApiRespRaw>("/analysis/history");
-  const parsed: HistoryItem[] = res.data.history.map(h => ({
+  const parsed: HistoryItem[] = res.data.history.map((h) => ({
     ...h,
     input: safeParse(h.input),
     result: safeParse(h.result),
