@@ -2,7 +2,9 @@ import OpenAI from "openai";
 import "dotenv/config";
 import { z } from "zod";
 
-/** 回傳 JSON 結構的驗證：先只允許四種方法，why 為非空字串 */
+/**
+ * 目前只允許四種方法
+ */
 const SuggestionSchema = z.object({
   method: z.enum(["independent_t", "paired_t", "anova", "correlation"]),
   why: z.string().min(1),
@@ -12,12 +14,9 @@ type Suggestion = z.infer<typeof SuggestionSchema>;
 const client = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
-/** ----------------------------- Public APIs ----------------------------- **/
 
 /**
- * 根據欄位與研究問題，產出「建議的統計方法」。
- * - 有 API key → 走 OpenAI；沒 key → 走規則式 fallback。
- * - 強制模型輸出 JSON，並用 Zod 驗證。
+ * 根據欄位與研究問題，產出「建議的統計方法」
  */
 export async function suggestMethod(params: {
   columns: string[];
@@ -45,7 +44,7 @@ export async function suggestMethod(params: {
         },
       ],
       temperature: 0.2,
-      response_format: { type: "json_object" }, // 強制 JSON
+      response_format: { type: "json_object" },
     });
     const text = resp.choices[0]?.message?.content ?? "{}";
 
@@ -53,7 +52,7 @@ export async function suggestMethod(params: {
     const parsed = SuggestionSchema.safeParse(JSON.parse(text));
     if (parsed.success) return parsed.data;
 
-    // 輸出不合格則走 fallback
+    // 不合格走 fallback
     return ruleBasedSuggest(columns, question, "malformed_model_output");
   } catch (err) {
     return ruleBasedSuggest(columns, question, "api_error");
@@ -61,7 +60,7 @@ export async function suggestMethod(params: {
 }
 
 /**
- * 將統計輸入 & 結果，生成解釋。
+ * 生成解釋
  */
 export async function explainResult(input: any, result: any): Promise<string> {
   if (!client) {
@@ -95,10 +94,10 @@ export async function explainResult(input: any, result: any): Promise<string> {
   }
 }
 
-/** ----------------------------- Fallbacks ----------------------------- **/
+/** Fallbacks **/
 
 /**
- * 無金鑰、API 失敗或額度用完時使用
+ * API 失敗或額度用完時用
  */
 function ruleBasedSuggest(
   columns: string[],
@@ -106,7 +105,7 @@ function ruleBasedSuggest(
   reason: string = "no_api_key"
 ): Suggestion {
   const q = question.toLowerCase();
-  // 極簡關鍵字判斷
+  // 關鍵字判斷
   if (q.includes("相關") || q.includes("correlat"))
     return { method: "correlation", why: "題意詢問關聯性" };
   if (q.includes("前後") || q.includes("paired") || q.includes("同一受試者"))

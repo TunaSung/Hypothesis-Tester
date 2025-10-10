@@ -243,20 +243,17 @@ export function anovaOneWay(
   const sst = ssb + ssw;
   const eta2 = sst === 0 ? 0 : ssb / sst;
 
-  // 粗略近似：方便先有 CI
+  // 粗略近似CI
   const varEta2Approx =
     (2 * eta2 ** 2 * (dfw ** 2 + (k - 1) ** 2)) / (N ** 2 * (k - 1) ** 2);
   const z = zScore(0.5 + ciLevel / 2);
-  const ciEta2: CI = {
-    level: ciLevel,
-    lower: clamp01(eta2 - z * Math.sqrt(Math.max(varEta2Approx, 0))),
-    upper: clamp01(eta2 + z * Math.sqrt(Math.max(varEta2Approx, 0))),
-  };
+  const etaLower = clamp01(eta2 - z * Math.sqrt(Math.max(varEta2Approx, 0)))
+  const etaUpper = clamp01(eta2 + z * Math.sqrt(Math.max(varEta2Approx, 0)))
 
   return {
     F,
     p,
-    ci: { eta2: ciEta2 },
+    ci: { level: ciLevel, lower: etaLower, upper: etaUpper },
     effectSize: { eta2 },
     dfb,
     dfw,
