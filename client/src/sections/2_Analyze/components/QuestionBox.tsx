@@ -1,6 +1,6 @@
 type QuestionBoxProps = {
   question: string;
-  setQuestion: (v: string) => void;
+  setQuestion: React.Dispatch<React.SetStateAction<string>>;
   onSuggest: () => void;
   disabled: boolean;
 };

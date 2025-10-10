@@ -1,8 +1,8 @@
-import type { SuggestionTest } from "../../../types/Analyze";
+import type { SuggestionTest, Method } from "../../../types/Analyze";
 
 type MethodChooserProps = {
-  selectedMethod: SuggestionTest["method"] | "";
-  setSelectedMethod: (m: SuggestionTest["method"] | "") => void;
+  selectedMethod: Method | "";
+  setSelectedMethod: React.Dispatch<React.SetStateAction<Method | "">>
   suggestedTest: SuggestionTest | null;
 };
 

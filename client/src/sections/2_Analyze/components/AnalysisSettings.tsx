@@ -1,12 +1,16 @@
 type AnalysisSettingsProps = {
   significanceLevel: number;
-  setSignificanceLevel: (v: number) => void;
+  setSignificanceLevel: React.Dispatch<React.SetStateAction<number>>;
 };
+
+const CONFIDENCE_OPTIONS = ["0.99", "0.95", "0.90"];
 
 export function AnalysisSettings({
   significanceLevel,
   setSignificanceLevel,
 }: AnalysisSettingsProps) {
+  const confidenceStr = (1 - significanceLevel).toFixed(2);
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
       <h3 className="text-lg font-semibold text-slate-800 mb-4">
@@ -18,13 +22,15 @@ export function AnalysisSettings({
             Confidence (1 − α)
           </label>
           <select
-            value={1 - significanceLevel}
+            value={confidenceStr}
             onChange={(e) => setSignificanceLevel(1 - Number(e.target.value))}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value={0.99}>99%</option>
-            <option value={0.95}>95%</option>
-            <option value={0.9}>90%</option>
+            {CONFIDENCE_OPTIONS.map((v) => (
+              <option key={v} value={v}>
+                {Number(v) * 100}%
+              </option>
+            ))}
           </select>
         </div>
       </div>

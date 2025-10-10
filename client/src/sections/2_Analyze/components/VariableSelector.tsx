@@ -5,17 +5,17 @@ type VariableSelectorProps = {
   method: Method;
   columns: string[];
   groupKey: string;
-  setGroupKey: (v: string) => void;
+  setGroupKey: React.Dispatch<React.SetStateAction<string>>;
   valueKey: string;
-  setValueKey: (v: string) => void;
+  setValueKey: React.Dispatch<React.SetStateAction<string>>;
   preKey: string;
-  setPreKey: (v: string) => void;
+  setPreKey: React.Dispatch<React.SetStateAction<string>>;
   postKey: string;
-  setPostKey: (v: string) => void;
+  setPostKey: React.Dispatch<React.SetStateAction<string>>;
   xKey: string;
-  setXKey: (v: string) => void;
+  setXKey: React.Dispatch<React.SetStateAction<string>>;
   yKey: string;
-  setYKey: (v: string) => void;
+  setYKey: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export function VariableSelector({
