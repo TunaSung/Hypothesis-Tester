@@ -5,6 +5,7 @@ import type {
   RunResp,
   UploadResp,
   RunApiRes,
+  SuggestionTest,
 } from "../types/Analyze";
 import type {
   GetHistoryApiResp,
@@ -29,13 +30,13 @@ export async function uploadCSV(formData: FormData): Promise<UploadResp> {
 export async function aiSuggest(
   datasetId: number,
   question: string
-): Promise<SuggestResp> {
+): Promise<SuggestionTest> {
   try {
     const { data } = await api.post<SuggestResp>("/analysis/suggest", {
       datasetId,
       question,
     });
-    return data;
+    return data.suggestion;
   } catch (error) {
     const msg = getErrorMessage(error, "Can't get AI suggestion");
     console.error("[SUGGEST_ERROR]", msg);

@@ -6,9 +6,10 @@ import { QuestionBox } from "./components/QuestionBox";
 import { UploadCard } from "./components/UploadCard";
 import { VariableSelector } from "./components/VariableSelector";
 import Result from "../../components/Layout/Result";
+import { useAuth } from "../../components/Context/authContext";
 
 import { uploadCSV, aiSuggest, runTest } from "../../service/analyze.service";
-import type { Method, RunResp, SuggestResp } from "../../types/Analyze";
+import type { Method, RunResp, SuggestionTest, SuggestResp } from "../../types/Analyze";
 
 function Analyze() {
   // Refs
@@ -22,7 +23,7 @@ function Analyze() {
 
   // Question / Suggest
   const [question, setQuestion] = useState("");
-  const [suggestedTest, setSuggestedTest] = useState<SuggestResp | null>(null);
+  const [suggestedTest, setSuggestedTest] = useState<SuggestionTest | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<Method | "">("");
 
   // Per-method keys
@@ -40,6 +41,9 @@ function Analyze() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<RunResp | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+
+  // toggleHistory
+  const { setToggleAnalysis } = useAuth()
 
   // Handlers
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
@@ -84,6 +88,8 @@ function Analyze() {
       setSelectedMethod(data.method);
     } catch (err: any) {
       setErrorMsg(err?.message ?? "Suggest failed");
+    } finally {
+      console.log(suggestedTest)
     }
   };
 
@@ -136,6 +142,7 @@ function Analyze() {
       setErrorMsg(err?.message ?? "Run failed");
     } finally {
       setIsAnalyzing(false);
+      setToggleAnalysis(prev => !prev)
     }
   };
 

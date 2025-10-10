@@ -1,9 +1,9 @@
-import type { SuggestResp } from "../../../types/Analyze";
+import type { SuggestionTest } from "../../../types/Analyze";
 
 type MethodChooserProps = {
-  selectedMethod: SuggestResp["method"] | "";
-  setSelectedMethod: (m: SuggestResp["method"] | "") => void;
-  suggestedTest: SuggestResp | null;
+  selectedMethod: SuggestionTest["method"] | "";
+  setSelectedMethod: (m: SuggestionTest["method"] | "") => void;
+  suggestedTest: SuggestionTest | null;
 };
 
 export function MethodChooser({

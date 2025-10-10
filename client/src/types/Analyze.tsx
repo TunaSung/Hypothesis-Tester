@@ -6,9 +6,14 @@ export type Method =
   | "correlation";
 
 export type SuggestResp = {
-  method: Method;
-  why: string;
+  message: string;
+  suggestion: SuggestionTest;
 };
+
+export type SuggestionTest = {
+    method: Method;
+    why: string;
+}
 
 export type RunResp = {
   id: number;

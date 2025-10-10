@@ -15,6 +15,7 @@ interface AuthContextValue {
   login: (token: string) => Promise<void>;
   logout: () => Promise<void>;
   history: HistoryItem[];
+  setToggleAnalysis: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 interface AuthProviderProps {
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [toggleAnalysis, setToggleAnalysis] = useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -42,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     };
     fetchUser();
-  }, []);
+  }, [toggleAnalysis]);
 
   const login = async (token: string) => {
     saveToken(token);
@@ -67,8 +69,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       login,
       logout,
       history,
+      setToggleAnalysis,
     }),
-    [isAuthenticated, login, logout, history]
+    [isAuthenticated, login, logout, history, setToggleAnalysis]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
