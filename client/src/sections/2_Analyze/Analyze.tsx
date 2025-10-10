@@ -9,7 +9,7 @@ import Result from "../../components/Layout/Result";
 import { useAuth } from "../../components/Context/authContext";
 
 import { uploadCSV, aiSuggest, runTest } from "../../service/analyze.service";
-import type { Method, RunResp, SuggestionTest, SuggestResp } from "../../types/Analyze";
+import type { Method, RunResp, SuggestionTest } from "../../types/Analyze";
 
 function Analyze() {
   // Refs
