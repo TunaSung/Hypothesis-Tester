@@ -30,7 +30,7 @@ function Sign() {
   );
 
   return (
-    <div className="bg-sky-100/40">
+    <div className="bg-sky-100/40 h-screen">
       <div className="container-mid py-8 flex justify-center items-center">
         <main
           className="border border-slate-300 w-full max-w-md aspect-[4/5] bg-white rounded-2xl p-8 shadow-md"
