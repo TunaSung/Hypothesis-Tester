@@ -31,6 +31,7 @@ function History() {
           <main className="w-full grid grid-cols-4 gap-3">
             {history.map((h) => (
               <HistoryCard
+                key={h.dataset.filename}
                 fileName={h.dataset.filename}
                 method={h.method}
                 input={h.input}
