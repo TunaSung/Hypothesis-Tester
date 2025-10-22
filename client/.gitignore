@@ -9,7 +9,6 @@ lerna-debug.log*
 
 # Dependency directories
 node_modules
-node_modules/
 dist
 dist-ssr
 *.local
@@ -27,8 +26,9 @@ dist-ssr
 *.sw?
 
 # environment variables
-*.env
-
-# server test
-/server/*.http
-/server/*.sql
+.env
+.env.*
+client/.env
+client/.env.*
+/server/.env
+/server/.env.*
