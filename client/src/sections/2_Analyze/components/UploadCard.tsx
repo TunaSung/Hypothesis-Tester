@@ -20,14 +20,11 @@ export function UploadCard({
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
       <h2 className="text-xl font-semibold text-slate-800 mb-4">Data Upload</h2>
-      <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
+      <div className={`border-2 border-slate-300 ${datasetId ? "border-solid" : "border-dashed"} rounded-xl p-8 text-center hover:border-blue-400 transition-colors`}>
         <div className="text-4xl mb-4">📊</div>
         <h3 className="text-lg font-medium text-slate-700 mb-2">
           Upload CSV File
         </h3>
-        <p className="text-slate-500 mb-4">
-          Drag and drop your data file or click to browse
-        </p>
         <input
           ref={fileInputRef}
           type="file"
@@ -40,7 +37,7 @@ export function UploadCard({
           className="bg-blue-400 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
           disabled={isUploading}
         >
-          {isUploading ? "Uploading..." : "Choose File"}
+          {!datasetId ? (isUploading ? "Uploading..." : "Choose File") : "Reselect"}
         </button>
         {datasetId && (
           <div className="mt-4 text-sm text-slate-600">
