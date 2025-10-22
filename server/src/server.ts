@@ -1,41 +1,42 @@
-import express from "express";
-import cors from "cors";
-import "dotenv/config";
-
+import { createApp } from "./app.js";
+import { env } from "./config/env.js";
+import { connectDB, closeDB } from "./loaders/db.js";
+import { registerStatic } from "./loaders/static.js";
 import "./models/Association.js";
-import datasetRouter from "./routes/dataset.route.js";
-import analysisRouter from "./routes/analysis.route.js";
-import authRouter from "./routes/auth.route.js";
-import { errorHandler } from "./middlewares/error.js";
-import { sqlize } from "./config/db.js";
 
-const app = express();
+const app = createApp();
 
-const origins = (process.env.CORS_ORIGINS || "http://localhost:5173").split(
-  ","
-);
+if (env.NODE_ENV === "production") {
+  registerStatic(app);
+}
 
-const corsOptions = {
-  origin: origins,
-  credentials: true,
-};
+let server: ReturnType<typeof app.listen> | undefined;
 
-app.use(cors(corsOptions)); // 全域套用
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads"));
+(async () => {
+  try {
+    await connectDB({ sync: env.NODE_ENV !== "production" });
+    server = app.listen(env.PORT, () => {
+      console.log(`Running on ${env.PORT} (${env.NODE_ENV})`);
+    });
+  } catch (err) {
+    console.error("Startup error:", err);
+    process.exit(1);
+  }
+})();
 
-app.use("/api/dataset", datasetRouter);
-app.use("/api/analysis", analysisRouter);
-app.use("/api/auth", authRouter);
+async function shutdown(signal: string) {
+  console.log(`\nReceived ${signal}, shutting down...`);
+  try {
+    if (server) await new Promise<void>((resolve) => server!.close(() => resolve()));
+    await closeDB();
+    console.log("Shutdown complete.");
+    process.exit(0);
+  } catch (e) {
+    console.error("Shutdown error:", e);
+    process.exit(1);
+  }
+}
 
-sqlize.sync().then(() => {
-  console.log("資料庫已同步");
-});
-
-app.use(errorHandler);
-
-const PORT = process.env.PORT || 3030;
-app.listen(PORT, () => {
-  console.log(`Running on ${PORT}`);
+["SIGINT", "SIGTERM"].forEach((sig) => {
+  process.on(sig as NodeJS.Signals, () => void shutdown(sig));
 });
