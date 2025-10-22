@@ -1,6 +1,7 @@
 import "./App.css";
 import { lazy, useEffect, Suspense } from "react";
 import Navbar from "./components/Layout/Navbar";
+import Footer from "./components/Layout/Footer";
 import {
   BrowserRouter as Router,
   Routes,
@@ -52,14 +53,14 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Navbar />
       <Suspense
         fallback={
-          <div className="fixed-mid">
+          <div className="h-screen flex justify-center items-center">
             <Spiral size="70" speed="0.95" color="black" />
           </div>
         }
       >
+        <Navbar />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/analyze" element={<Analyze />} />
@@ -68,6 +69,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/sign" element={<Sign />} />
         </Routes>
+        <Footer />
       </Suspense>
     </Router>
   );
