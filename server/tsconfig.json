@@ -40,5 +40,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-  "include": ["src", "server.ts", "app.ts"]
+  "include": ["src", "server.ts", "app.ts", "src/types/**/*.d.ts"]
 }
