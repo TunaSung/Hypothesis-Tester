@@ -1,17 +1,23 @@
-# --- build ---
-FROM node:20-alpine AS build
-WORKDIR /app/server
-COPY server/package*.json ./
+# ==== Build client ====
+FROM node:20-alpine AS client
+WORKDIR /app/client
+
+COPY client/package*.json ./
 RUN npm ci
-COPY server .        
+COPY client/ ./
+
 RUN npm run build
 
-# --- runner ---
-FROM node:20-alpine AS runner
+# ==== Build server ====
+FROM node:20-alpine AS server
 WORKDIR /app/server
-ENV NODE_ENV=production
+
 COPY server/package*.json ./
 RUN npm ci --omit=dev
-COPY --from=build /app/server/dist ./dist
+COPY server/ ./
+    
+COPY --from=client /app/client/dist ./public
+
+ENV PORT=8080 NODE_ENV=production
 EXPOSE 8080
-CMD ["node","dist/server.js"]
+CMD ["node", "server.js"]
