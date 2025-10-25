@@ -15,9 +15,11 @@ let server: ReturnType<typeof app.listen> | undefined;
 (async () => {
   try {
     await connectDB({ sync: env.NODE_ENV !== "production" });
+
     server = app.listen(env.PORT, () => {
       console.log(`Running on ${env.PORT} (${env.NODE_ENV})`);
     });
+    
   } catch (err) {
     console.error("Startup error:", err);
     process.exit(1);
