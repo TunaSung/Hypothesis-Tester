@@ -1,14 +1,9 @@
 import { createApp } from "./app.js";
 import { env } from "./config/env.js";
 import { connectDB, closeDB } from "./loaders/db.js";
-import { registerStatic } from "./loaders/static.js";
 import "./models/Association.js";
 
 const app = createApp();
-
-if (env.NODE_ENV === "production") {
-  registerStatic(app);
-}
 
 let server: ReturnType<typeof app.listen> | undefined;
 
