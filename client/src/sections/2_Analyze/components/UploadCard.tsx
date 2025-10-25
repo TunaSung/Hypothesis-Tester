@@ -37,7 +37,7 @@ export function UploadCard({
           className="bg-blue-400 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
           disabled={isUploading}
         >
-          {!datasetId ? (isUploading ? "Uploading..." : "Choose File") : "Reselect"}
+          {!datasetId ? (isUploading ? "Uploading..." : "Choose File") : (isUploading ? "Uploading..." : "Change File")}
         </button>
         {datasetId && (
           <div className="mt-4 text-sm text-slate-600">
