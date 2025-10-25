@@ -1,16 +1,13 @@
 import express, { type Express } from "express";
 import path from "path";
-import { getDirname } from "../config/path.js";
 
 export function registerStatic(app: Express) {
-  const __dirname = getDirname(import.meta.url);
-  const staticPath = path.join(__dirname, "..", "public");
+  const staticPath = path.resolve(process.cwd(), "public");
 
   app.use(express.static(staticPath));
 
-  // SPA fallback（避免覆蓋 /api/*）
-  app.use((req, res, next) => {
-    if (req.method !== "GET" || req.path.startsWith("/api/")) return next();
+  // SPA fallback：避開 /api/*
+  app.get(/^\/(?!api).*/, (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 }
