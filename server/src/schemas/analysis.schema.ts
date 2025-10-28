@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// suggest
+// Suggest
 const base = {
   datasetId: z.number().int().positive(),
 };
@@ -17,7 +17,8 @@ export const suggestSchema = z.object({
   params: z.object({}).strict(),
 });
 export type SuggestBody = z.infer<typeof suggestSchema>["body"];
-// analysis
+
+// Analysis
 const ci = { ciLevel: z.number().min(0.8).max(0.999).optional() };
 
 const independentArgs = z
@@ -79,3 +80,21 @@ export const runAnalysisSchema = z.object({
   params: z.object({}).strict(),
 });
 export type RunAnalysisBody = z.infer<typeof runAnalysisSchema>["body"];
+
+// History
+export const listAnalysesByIdKeysetSchema = z.object({
+  body: z.object({}).strict(),
+  query: z
+    .object({
+      limit: z.coerce.number().int().min(1).max(100).default(20),
+      after: z.string().optional(),
+      before: z.string().optional(),
+      datasetId: z.coerce.number().int().optional(),
+      method: z.string().trim().optional(),
+      includeTotal: z.string().trim().optional(),
+      includeStats: z.string().trim().optional(),
+    })
+    .strict(),
+  params: z.object({}).strict(),
+});
+export type ListAnalysesByIdKeysetQuery = z.infer<typeof listAnalysesByIdKeysetSchema>["query"]

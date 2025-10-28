@@ -3,12 +3,13 @@ import {
   Model,
   type InferAttributes,
   type InferCreationAttributes,
+  type CreationOptional,
 } from "sequelize";
 import { sqlize } from "../config/db.js";
 
 export class Analysis extends Model<
-  InferAttributes<Analysis>,
-  InferCreationAttributes<Analysis>
+  InferAttributes<Analysis, { omit: "createdAt" }>,  // 不 omit 的話 就需要加在 init 裡
+  InferCreationAttributes<Analysis, { omit: "createdAt"}>
 > {
   declare id?: number;
   declare datasetId: number;
@@ -17,6 +18,7 @@ export class Analysis extends Model<
   declare input: string; // JSON: 使用者指定欄位/群組
   declare result: string; // JSON: 檢定結果（統計量、p、ci）
   declare aiSummary: string; // AI 自然語言解釋
+  declare createdAt: CreationOptional<Date>;
 }
 
 Analysis.init(
