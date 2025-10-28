@@ -99,6 +99,6 @@ Content-Type: application/json
 GET http://localhost:8080/api/analysis/history
 Content-Type: application/json
 
-### 抓特定資料
-GET http://localhost:8080/api/analysis/1
+### 分頁
+GET http://localhost:8080/api/analysis/history/keyset?limit=12&includeTotal=1&includeStats=1
 Content-Type: application/json
