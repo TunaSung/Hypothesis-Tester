@@ -1,8 +1,13 @@
-import { useMemo, useState } from "react";
-import { useAuth } from "../../components/Context/authContext";
-import { type KnownMethod } from "../../types/Analyze";
+// pages/History.tsx
+import { useEffect, useState } from "react";
 import HistoryCard from "./components/HistoryCard";
 import FilterPill from "./components/FilterPill";
+import { listAnalysesByKeyset } from "../../service/analyze.service";
+import type {
+  AnalysisHistoryItem,
+  PageInfo,
+  KnownMethod,
+} from "../../types/Analyze";
 
 const METHOD_LABEL: Record<KnownMethod, string> = {
   independent_t: "Independent t-test",
@@ -11,37 +16,67 @@ const METHOD_LABEL: Record<KnownMethod, string> = {
   correlation: "Pearson correlation",
 };
 
-function History() {
-  const { history } = useAuth();
+const ALL_METHODS: KnownMethod[] = [
+  "independent_t",
+  "paired_t",
+  "anova",
+  "correlation",
+];
 
-  // 取得所有出現過的方法
-  const methodsInHistory = useMemo(() => {
-    const set = new Set<KnownMethod>();
-    history.forEach((h: any) => set.add(h.method as KnownMethod));
-    return Array.from(set).sort();
-  }, [history]);
-
-  // amount of each method 
-  const counts = useMemo(() => {
-    const c: Record<string, number> = {};
-    history.forEach((h: any) => {
-      c[h.method] = (c[h.method] ?? 0) + 1;
-    });
-    return c;
-  }, [history]);
-
-  // ("all" | method）
+export default function History() {
+  const [items, setItems] = useState<AnalysisHistoryItem[]>([]);
+  const [pageInfo, setPageInfo] = useState<PageInfo>({
+    limit: 12,
+    hasPrevPage: false,
+    hasNextPage: false,
+    startCursor: null,
+    endCursor: null,
+    total: 0,
+  });
+  const [cursor, setCursor] = useState<{ after?: string; before?: string }>({});
   const [active, setActive] = useState<string>("all");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  const filtered = useMemo(() => {
-    if (active === "all") return history;
-    return history.filter((h: any) => h.method === active);
-  }, [history, active]);
+  const methodFilter = active === "all" ? undefined : active;
+  const pageSize = 12;
+  const stats = pageInfo.methodStats ?? {}; // 後端回的全域統計（忽略 method 篩選）
+  const allCount = pageInfo.total ?? items.length;
+
+  useEffect(() => {
+    setCursor({});
+  }, [methodFilter]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        setErr(null);
+        const data = await listAnalysesByKeyset({
+          method: methodFilter,
+          limit: pageSize,
+          ...cursor,
+        });
+        if (!cancelled) {
+          setItems(data.items);
+          setPageInfo(data.pageInfo);
+        }
+      } catch (e: any) {
+        if (!cancelled) setErr(e?.message ?? "Unknown error");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [methodFilter, pageSize, cursor]);
 
   return (
     <div className="bg-sky-100/40 min-h-screen">
       <div className="container-mid py-8">
-        {/* Start Header */}
+        {/* Header */}
         <header className="mb-6 sm:mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">
             Analysis History
@@ -50,9 +85,8 @@ function History() {
             View and access your previous statistical analyses
           </p>
         </header>
-        {/* End Header */}
 
-        {/* Start Filter */}
+        {/* Filters */}
         <section className="mb-6">
           <div className="bg-white border border-slate-200 rounded-2xl p-3 md:p-4 shadow-sm">
             <div className="flex flex-wrap gap-2">
@@ -60,28 +94,53 @@ function History() {
                 active={active === "all"}
                 onClick={() => setActive("all")}
                 label="All"
-                count={history.length}
+                count={allCount}
               />
-              {methodsInHistory.map((m) => (
+              {ALL_METHODS.map((m) => (
                 <FilterPill
                   key={m}
                   active={active === m}
                   onClick={() => setActive(m)}
                   label={METHOD_LABEL[m] ?? m}
-                  count={counts[m] ?? 0}
+                  count={stats[m] ?? 0}
                 />
               ))}
             </div>
           </div>
         </section>
-        {/* End Filter */}
 
-        {/* Start History List */}
-        {filtered.length === 0 ? (
+        {/* Pager */}
+        <div className="flex items-center gap-2 mb-3">
+          <button
+            disabled={!pageInfo.hasPrevPage || loading}
+            onClick={() =>
+              setCursor({ before: pageInfo.startCursor ?? undefined })
+            }
+            className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50  disabled:cursor-no-drop"
+          >
+            Prev
+          </button>
+          <button
+            disabled={!pageInfo.hasNextPage || loading}
+            onClick={() =>
+              setCursor({ after: pageInfo.endCursor ?? undefined })
+            }
+            className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 disabled:cursor-no-drop"
+          >
+            Next
+          </button>
+          {loading && <span className="text-slate-500 text-sm">Loading…</span>}
+          {err && <span className="text-red-600 text-sm">{err}</span>}
+        </div>
+
+        {/* List */}
+        {items.length === 0 ? (
           <main className="flex flex-col justify-center items-center gap-4 font-semibold py-16">
             <p className="text-5xl">📊</p>
             <h2 className="text-2xl">
-              {active === "all" ? "No analyses yet" : "No analyses for this method"}
+              {active === "all"
+                ? "No analyses yet"
+                : "No analyses for this method"}
             </h2>
             <p className="text-slate-400 text-sm">
               {active === "all"
@@ -91,11 +150,10 @@ function History() {
           </main>
         ) : (
           <main className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {filtered.map((h: any, idx: number) => (
+            {items.map((h) => (
               <HistoryCard
-                // filename 可能重複，改用 index 或你的唯一 id（若有）
-                key={`${h.dataset?.filename ?? "file"}-${idx}`}
-                fileName={h.dataset?.filename}
+                key={h.id}
+                fileName={h.dataset?.filename ?? "Untitled"}
                 method={h.method}
                 input={h.input}
                 result={h.result}
@@ -105,10 +163,29 @@ function History() {
             ))}
           </main>
         )}
-        {/* End History List */}
+
+        {/* Footer Pager */}
+        <div className="flex items-center justify-end gap-2 mt-6">
+          <button
+            disabled={!pageInfo.hasPrevPage || loading}
+            onClick={() =>
+              setCursor({ before: pageInfo.startCursor ?? undefined })
+            }
+            className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 disabled:cursor-no-drop"
+          >
+            Prev
+          </button>
+          <button
+            disabled={!pageInfo.hasNextPage || loading}
+            onClick={() =>
+              setCursor({ after: pageInfo.endCursor ?? undefined })
+            }
+            className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-50 disabled:cursor-no-drop"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
-export default History;
