@@ -10,7 +10,9 @@ type FilterPillProps = {
 function FilterPill({ active, onClick, label, count }: FilterPillProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={[
         "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm border transition",
         active
