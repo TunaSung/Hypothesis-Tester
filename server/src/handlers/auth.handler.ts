@@ -18,6 +18,9 @@ function pickSafeUser<
   return rest as Omit<typeof plain, "password">;
 }
 
+/**
+ * 註冊
+ */
 export const signUp: RequestHandler = async (req, res, next) => {
   try {
     const { username, email, password } = req.body as SignUpBody;
@@ -41,6 +44,9 @@ export const signUp: RequestHandler = async (req, res, next) => {
   }
 };
 
+/**
+ * 登入
+ */
 export const signIn: RequestHandler = async (req, res) => {
   try {
     const { email, password } = req.body as SignInBody;
@@ -75,6 +81,9 @@ export const signIn: RequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * Refresh Token
+ */
 export const refreshToken: RequestHandler = async (req, res) => {
   const { refreshToken } = req.body as RefreshTokenBody;
   if (!refreshToken)
@@ -92,14 +101,15 @@ export const refreshToken: RequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * 之後要完成的 忘記密碼
+ */
 // export const forgotPassword: RequestHandler = async (req, res) => {
 //     const { email } = req.body as ForgotPasswordBody;
 //     const user = await User.findOne({ where: { email: email.toLowerCase() } });
 //     if (!user) {
 //         return res.status(404).json({ error: "Email not found" });
 //     }
-
-//     // 通常會生成一次性 token，寄 email link
 //     const secret = process.env.JWT_SECRET!;
 //     const resetToken = jwt.sign({ userId: user.id }, secret, { expiresIn: "15m" });
 //     return res.json({ message: "Password reset link generated", resetToken });

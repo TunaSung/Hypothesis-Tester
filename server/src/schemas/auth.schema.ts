@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// 註冊
 export const signUpSchema = z.object({
   body: z
     .object({
@@ -14,6 +15,7 @@ export const signUpSchema = z.object({
 });
 export type SignUpBody = z.infer<typeof signUpSchema>["body"];
 
+// 登入
 export const signInSchema = z.object({
   body: z
     .object({
@@ -27,6 +29,7 @@ export const signInSchema = z.object({
 });
 export type SignInBody = z.infer<typeof signInSchema>["body"];
 
+// Refresh
 export const refreshTokenSchema = z.object({
   body: z
     .object({
@@ -39,6 +42,7 @@ export const refreshTokenSchema = z.object({
 });
 export type RefreshTokenBody = z.infer<typeof refreshTokenSchema>["body"];
 
+// Forget
 // export const forgotPasswordSchema = z.object({
 //   body: z.object({
 //     email: z.string().email(),
