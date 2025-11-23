@@ -42,9 +42,6 @@ function Analyze() {
   const [result, setResult] = useState<RunResp | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // toggleHistory
-  const { setToggleAnalysis } = useAuth()
-
   // Handlers
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
     e
@@ -142,7 +139,6 @@ function Analyze() {
       setErrorMsg(err?.message ?? "Run failed");
     } finally {
       setIsAnalyzing(false);
-      setToggleAnalysis(prev => !prev)
     }
   };
 
