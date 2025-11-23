@@ -9,14 +9,22 @@ import type {
   RefreshTokenBody /*ForgotPasswordBody*/,
 } from "../schemas/auth.schema.js";
 
+/**
+ * 不把密碼回傳到前端
+ * 目前還沒有要用到純 JS 物件的功能
+ * 之後如果有要直接傳純 JS 物件給前端也可以用
+ */
 function pickSafeUser<
   T extends { get?: (opts?: any) => any; password?: string }
 >(u: T) {
   const plain =
     typeof u?.get === "function" ? u.get({ plain: true }) : (u as any);
+    // 用 typeof u?.get === "function" 來判斷 u 是不是像 Sequelize instance
+    // 是的話用 u.get({ plain: true }) 將其從 Sequelize instance 轉成 JS 物件，這樣才能把敏感資料拿掉
   const { password, ...rest } = plain ?? {};
   return rest as Omit<typeof plain, "password">;
 }
+
 
 /**
  * 註冊
