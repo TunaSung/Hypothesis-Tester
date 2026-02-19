@@ -5,3 +5,5 @@
 /server/.env.*
 node_modules/
 dist/
+*.sql
+*.http
